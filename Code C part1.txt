@@ -1,0 +1,17 @@
+#include <stdio.h>
+int main(){
+    int num = 0 ,mod = 2;
+    printf("Prime factors : ");
+    scanf("%d", &num);
+    if(num==1){
+        printf("%d", num);
+    }
+    while(num != 1){
+        while(num % mod == 0){
+            printf("%d ", mod);
+            num = num / mod;
+        }
+        mod++;
+    }
+    return 0;
+}
