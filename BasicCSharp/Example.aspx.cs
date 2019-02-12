@@ -18,45 +18,35 @@ namespace BasicCSharp
 
         protected void BtnClick_Click(object sender, EventArgs e)
         {
-            string textFile = File.ReadAllText(@"C:\GitHub\ExamDotNet\text.txt", Encoding.UTF8);
-            string[] stringArry = textFile.Split(' ');
-            string typeStringText = string.Concat(stringArry);
+            string textFile = File.ReadAllText(@"C:\GitHub\ExamDotNet\palin_input.txt", Encoding.UTF8);
+            //string[] arryText = new[] { textFile }; // string->string[]
+            //string typeArryText = string.Concat(arryText);
 
-            //string[] aryText = new[] { textFile }; // string->string[]
-            //int count = stringTextFile.Length;
-            //string[] stringReverseText = new string[count];
-            //for (int i = 0; i < stringTextFile.Length-1; i++)
-            //{
-            //    stringReverseText[i] = stringTextFile[count-1];
-            //    count--;
-            //} //ArrayIndex End->Start
-
-            char[] charArry = typeStringText.ToCharArray();
+            string stringLower= textFile.ToLowerInvariant();
+            char[] charArry = stringLower.ToCharArray(); 
             string reverseText = string.Empty;
             for (int i = charArry.Length-1 ; i > -1 ; i--)
             {
                 reverseText += charArry[i];
             }
-            
-            string[] TextArry = textFile.Split();
+            string[] stringArry = stringLower.Split();
             string[] reverseArry = reverseText.Split();
-            int k = TextArry.Length;
-            int count = 0;
+            int count = 0, k = stringArry.Length;
 
             for (int i = 0; i < k; i++)
             {
                 for (int j = 0; j < k; j++)
                 {
-                    if (!string.IsNullOrEmpty(TextArry[i]))
+                    if (!string.IsNullOrEmpty(stringArry[i]))
                     {
-                        if (TextArry[i] == reverseArry[j])
+                        if (stringArry[i] == reverseArry[j])
                         {
                             count++;
                         }
                     }
                 }
             }
-            lblTextFile.Text = typeStringText;
+            lblTextFile.Text = textFile;
             lblTextReverse.Text = reverseText;
             lblResult.Text = count.ToString();
 
