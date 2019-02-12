@@ -19,26 +19,22 @@ namespace ExamDotNetCSharp
         protected void btnSbmt_Click(object sender, EventArgs e)
         {
             //string[] lines = File.ReadAllLines(@"C:\GitHub\ExamDotNet\text.txt");
-            string text = File.ReadAllText(@"C:\GitHub\ExamDotNet\text.txt");
-            lblShowtext.Text = text;
+            string textFile = File.ReadAllText(@"C:\GitHub\ExamDotNet\text.txt");
+            //lblShowtext.Text = textFile;
 
-            //// Location of the letter c.
-            //int i = text.IndexOf("palindrome");
-            //// Remainder of string starting at c.
-            //string d = text.Substring(i);
-            //lblShowMessagetxt.Text = d;
 
-            int count = 0;
-            string stringToCheck = "palindrome";
-            string[] stringArray = { "palindrome", "text1", "texttest", "palindrome" };
-            foreach (string x in stringArray)
-            {
-                if (stringToCheck.Contains(x))
-                {
-                    count++;
-                }
-            }
-            lblShowMessagetxt.Text = count.ToString();
+
+            //int count = 0;
+            //string stringToCheck = "palindrome";
+            //string[] stringArray = { "palindrome", "text1", "texttest", "palindrome" };
+            //foreach (string x in stringArray)
+            //{
+            //    if (stringToCheck.Contains(x))
+            //    {
+            //        count++;
+            //    }
+            //}
+            //lblShowMessagetxt.Text = count.ToString();
         }
     }
 }
