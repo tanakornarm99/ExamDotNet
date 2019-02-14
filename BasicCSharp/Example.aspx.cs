@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -18,19 +19,21 @@ namespace BasicCSharp
 
         protected void BtnClick_Click(object sender, EventArgs e)
         {
-            string textFile = File.ReadAllText(@"C:\GitHub\ExamDotNet\palin_input.txt", Encoding.UTF8);
-            //string[] arryText = new[] { textFile }; // string->string[]
-            //string typeArryText = string.Concat(arryText);
-
-            string stringLower= textFile.ToLowerInvariant();
-            char[] charArry = stringLower.ToCharArray(); 
+            char[] delimiterChars = { ' ','.',',','-','!','\r','\n','\t' };
             string reverseText = string.Empty;
+            string result = string.Empty;
+
+            string textFile = File.ReadAllText(@"C:\GitHub\ExamDotNet\palin_input.txt", Encoding.UTF8);
+            string stringLower = textFile.ToLower();
+            char[] charArry = stringLower.ToCharArray();
+            //string resultRegex = Regex.Replace(textFile, @"[^\w", "");
             for (int i = charArry.Length-1 ; i > -1 ; i--)
             {
                 reverseText += charArry[i];
             }
-            string[] stringArry = stringLower.Split();
-            string[] reverseArry = reverseText.Split();
+            
+            string[] stringArry = stringLower.Split(delimiterChars);
+            string[] reverseArry = reverseText.Split(delimiterChars);
             int count = 0, k = stringArry.Length;
 
             for (int i = 0; i < k; i++)
@@ -41,16 +44,19 @@ namespace BasicCSharp
                     {
                         if (stringArry[i] == reverseArry[j])
                         {
+                            result += reverseArry[j].ToString() + " ";
                             count++;
                         }
                     }
                 }
             }
-            lblTextFile.Text = textFile;
-            lblTextReverse.Text = reverseText;
+            lblTextFile.Text = stringLower;
+            lblTextReverse.Text = result;
             lblResult.Text = count.ToString();
 
-
+            //string[] arryText = new[] { textFile }; // string->string[]
+            //string typeArryText = string.Concat(arryText);               
+            //var onlyLetters = new String(stringLower.Where(Char.IsLetter).ToArray());
             //---------------------------//
             string typeString1 = "My name is Armm";
             string[] typeStringSpilt = typeString1.Split(' '); //เก็บในรูปแบบ Array
