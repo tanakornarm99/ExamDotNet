@@ -24,7 +24,7 @@ namespace BasicCSharp
             string result = string.Empty;
 
             string textFile = File.ReadAllText(@"C:\GitHub\ExamDotNet\palin_input.txt", Encoding.UTF8);
-            string stringLower = textFile.ToLower();
+            string stringLower = textFile.ToLower().Trim();
             char[] charArry = stringLower.ToCharArray();
             //string resultRegex = Regex.Replace(textFile, @"[^\w", "");
             for (int i = charArry.Length-1 ; i > -1 ; i--)

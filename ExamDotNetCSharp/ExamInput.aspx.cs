@@ -20,6 +20,7 @@ namespace ExamDotNetCSharp
             int num = Convert.ToInt32(strNumInput);
             int mod = 2; 
             string result = string.Empty;
+            string resultString = string.Empty;
 
             if (num == 1)
             {
@@ -35,7 +36,6 @@ namespace ExamDotNetCSharp
                 mod++;
             }
             string[] resultArray = result.Trim().Split();
-            string resultString = string.Empty;
             var myList = new List<string>();
             foreach (var s in resultArray)
             {
@@ -50,28 +50,28 @@ namespace ExamDotNetCSharp
 
             //int check = 0;
             //string txtStr = "2 2 2 2 5 5 7";
-            //string[] resultArray = txtStr.Trim().Split();
+            //string[] resultArr = txtStr.Trim().Split();
             //string resultValue = string.Empty;
             //string resultValue2 = string.Empty;
-            //for (int i = 0; i < resultArray.Length; i++)
+            //for (int i = 0; i < resultArr.Length; i++)
             //{
-            //    for (int j = i+1; j < resultArray.Length; j++)
+            //    for (int j = i + 1; j < resultArr.Length; j++)
             //    {
-            //        if (resultArray[i] == resultArray[j])
+            //        if (resultArr[i] == resultArr[j])
             //        {
             //            if (check == 0)
             //            {
-            //                resultValue += resultArray[j].ToString() + " ";
+            //                resultValue += resultArr[j].ToString() + " ";
             //                check = 1;
             //                break;
             //            }
+            //            else
+            //            {
+            //                resultValue2 += resultArray[j].ToString() + " ";
+            //                check = 0;
+            //                break;
+            //            }
             //        }
-            //        else {
-            //            //resultValue2 += resultArray[j].ToString() + " ";
-            //            check = 0;
-            //            break;
-            //        }
-
             //    }
             //}
 
