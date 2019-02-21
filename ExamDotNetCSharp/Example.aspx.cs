@@ -37,7 +37,6 @@ namespace ExamDotNetCSharp
                 using (SqlConnection sqlConnection = new SqlConnection(constr))
                 {
                     sqlConnection.Open();
-
                     SqlCommand cmd = new SqlCommand();
                     cmd.Connection = sqlConnection;
                     cmd.CommandText = "Select * from [Order]";
