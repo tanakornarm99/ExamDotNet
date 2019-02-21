@@ -99,7 +99,7 @@ namespace BasicCSharp
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
         }
 
-      
+
 
         private void UpdateCategoryOrderItem(string cateOldName, string cateNewName)
         {
@@ -546,14 +546,23 @@ namespace BasicCSharp
         {
             int length = 4;
             string orderNo = string.Empty;
-            using (SqlConnection connection = new SqlConnection(conString))
+
+            DataTable getOrder = GetAllOrder();
+            if (getOrder.Rows.Count == 0)
             {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "SELECT TOP 1 OrderNumber FROM [Order] ORDER BY ID DESC";
-                orderNo = cmd.ExecuteScalar().ToString();
+                orderNo = "ORD2019000000";
+            }
+            else
+            {
+                using (SqlConnection connection = new SqlConnection(conString))
+                {
+                    connection.Open();
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.Connection = connection;
+                    cmd.CommandType = CommandType.Text;
+                    cmd.CommandText = "SELECT TOP 1 OrderNumber FROM [Order] ORDER BY ID DESC";
+                    orderNo = cmd.ExecuteScalar().ToString();
+                }
             }
             string subOrderNo = orderNo.Substring(orderNo.Length - 4);
             int numberOrder = Convert.ToInt32(subOrderNo) + 1;
