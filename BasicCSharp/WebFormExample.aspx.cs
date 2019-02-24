@@ -221,28 +221,31 @@ namespace BasicCSharp
             double sumPrice = 0;
             string date = DateTime.Now.ToString();
             string orderNumber = lblOrderNo.Text;
-            string firstName = txtFirstname.Text.Trim();
-            string sureName = txtSurename.Text.Trim();
+            string firstName = txtFirstName.Text.Trim();
+            string sureName = txtSureName.Text.Trim();
             string contact = txtContact.Text.Trim();
             string email = txtEmail.Text.Trim();
             string nameFrom = firstName + " " + sureName;
             if (!string.IsNullOrEmpty(firstName) && !string.IsNullOrEmpty(sureName))
             {
-                    string cmdText = "INSERT INTO [Order] (OrderNumber,[From],SummaryPrice,Date) VALUES (@orderNumber,@from,@sumPrice,@date)";
-                    List<Param> parameters = new List<Param>();
-                    parameters.Add(SetParam("orderNumber", orderNumber));
-                    parameters.Add(SetParam("from", nameFrom));
-                    parameters.Add(SetParam("sumPrice", sumPrice));
-                    parameters.Add(SetParam("date", date));
-                    ExecuteQuery(cmdText, parameters);
+                string cmdText = "INSERT INTO [Order] (OrderNumber,[From],SummaryPrice,Date) VALUES (@orderNumber,@from,@sumPrice,@date)";
+                List<Param> parameters = new List<Param>();
+                parameters.Add(SetParam("orderNumber", orderNumber));
+                parameters.Add(SetParam("from", nameFrom));
+                parameters.Add(SetParam("sumPrice", sumPrice));
+                parameters.Add(SetParam("date", date));
+                ExecuteQuery(cmdText, parameters);
 
-                    string cmd = "INSERT INTO [Customer] (Firstname,Surename,Contact,Email) VALUES (@firstName,@sureName,@contact,@email)";
-                    List<Param> paramety = new List<Param>();
-                    paramety.Add(SetParam("firstName", firstName));
-                    paramety.Add(SetParam("sureName", sureName));
-                    paramety.Add(SetParam("contact", contact));
-                    paramety.Add(SetParam("email", email));
-                    ExecuteQuery(cmd, paramety);
+                //string oderId = GetOrderId(orderNumber);
+                //paramety.Add(SetParam("orderId", orderId));
+
+                string cmd = "INSERT INTO [Customer] (Firstname,Surename,Contact,Email) VALUES (@firstName,@sureName,@contact,@email)";
+                List<Param> paramety = new List<Param>();
+                paramety.Add(SetParam("firstName", firstName));
+                paramety.Add(SetParam("sureName", sureName));
+                paramety.Add(SetParam("contact", contact));
+                paramety.Add(SetParam("email", email));
+                ExecuteQuery(cmd, paramety);
             }
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
         }
@@ -251,7 +254,7 @@ namespace BasicCSharp
         {
             string orderId = CONTSTANT_OrderID;
             string date = DateTime.Now.ToString();
-            string name = txtFirstname.Text;
+            string name = txtFirstName.Text;
             if (!string.IsNullOrEmpty(name))
             {
                 string cmdText = "UPDATE [Order] SET [From] = @name, Date = @date WHERE Id = @orderId";
@@ -516,8 +519,10 @@ namespace BasicCSharp
             string orderId = row.Cells[2].Text;
             CONTSTANT_OrderID = orderId;
             lblOrderNo.Text = row.Cells[3].Text;
-            txtFirstname.Text = row.Cells[4].Text;
-            //lblOrderPrice.Text = row.Cells[5].Text;
+            string strName = row.Cells[4].Text;
+            string[] strSpName = strName.Split(' ');
+            txtFirstName.Text = strSpName[0];
+            txtSureName.Text = strSpName[1];
 
             ShowTotalPrice(orderId);
 

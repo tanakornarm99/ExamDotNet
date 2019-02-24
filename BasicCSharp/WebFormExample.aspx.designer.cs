@@ -211,22 +211,22 @@ namespace BasicCSharp {
         protected global::System.Web.UI.WebControls.Button btnClearOrder;
         
         /// <summary>
-        /// txtFirstname control.
+        /// txtFirstName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtFirstname;
+        protected global::System.Web.UI.WebControls.TextBox txtFirstName;
         
         /// <summary>
-        /// txtSurename control.
+        /// txtSureName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtSurename;
+        protected global::System.Web.UI.WebControls.TextBox txtSureName;
         
         /// <summary>
         /// txtContact control.

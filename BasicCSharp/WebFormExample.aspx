@@ -82,9 +82,9 @@
         </div>
         <div class="container">
             <asp:Label Text="Firstname :" runat="server" />
-            <asp:TextBox ID="txtFirstname" runat="server" CssClass="col-sm-3" />
+            <asp:TextBox ID="txtFirstName" runat="server" CssClass="col-sm-3" />
             <asp:Label Text="Surename :" runat="server" CssClass="col-sm-2" />
-            <asp:TextBox ID="txtSurename" runat="server" CssClass="col-sm-3" /><br />
+            <asp:TextBox ID="txtSureName" runat="server" CssClass="col-sm-3" /><br />
             <br />
         </div>
         <div class="container">
