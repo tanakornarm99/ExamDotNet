@@ -43,7 +43,7 @@
             <asp:Button ID="btnClearItem" Text="Cancel" runat="server" CssClass="btn btn-danger" OnClick="ClearItem" />
         </div>
         <div class="container">
-            <asp:GridView ID="gvItem" runat="server" DataKeyNames="Id" OnSelectedIndexChanged="GvItem_Selected" OnRowDeleting="GvItem_Delete" Width="580px">
+            <asp:GridView ID="gvItem" runat="server" DataKeyNames="Id" OnSelectedIndexChanged="GvItem_Selected" OnRowDeleting="GvItem_Delete">
                 <Columns>
                     <asp:CommandField HeaderText="Update" ShowSelectButton="True" />
                     <asp:CommandField HeaderText="Delete" ShowDeleteButton="True" />
@@ -59,7 +59,8 @@
                     <asp:CommandField HeaderText="Update" ShowSelectButton="true" />
                     <asp:CommandField HeaderText="Delete" ShowDeleteButton="true" />
                 </Columns>
-            </asp:GridView><br/>
+            </asp:GridView>
+            <br />
         </div>
         <div class="container">
             <asp:Label ID="lblGvAddItem" Text="GridView : Add Item" runat="server" Visible="false" />
@@ -67,11 +68,12 @@
                 <Columns>
                     <asp:CommandField HeaderText="Select" ShowSelectButton="true" />
                 </Columns>
-            </asp:GridView><br/>
+            </asp:GridView>
+            <br />
         </div>
         <div class="container">
             <asp:Label Text="Order No :" runat="server" />
-            <asp:Label ID="lblOrderId" runat="server" Visible="false" />
+            <%--<asp:Label ID="lblOrderId" runat="server" Visible="false" />--%>
             <asp:Label ID="lblOrderPrice" runat="server" Visible="false" />
             <asp:Label ID="lblOrderNo" runat="server" CssClass="col-sm-3" />
             <asp:Label Text="Name :" runat="server" />
@@ -95,15 +97,16 @@
         </div>--%>
         <div class="container">
             <asp:Button ID="btnAddOrderItem" Text="Add Item" runat="server" CssClass="btn btn-primary" OnClick="AddOrderItem_Click" Visible="false" />
-            <asp:Label ID="lblTotaltxt" Text="Total :" runat="server" CssClass="col-sm-3" Visible="false"/>
+            <asp:Label ID="lblTotaltxt" Text="Total :" runat="server" CssClass="col-sm-3" Visible="false" />
             <asp:Label ID="lblTotalPrice" runat="server" />
         </div>
         <div class="container">
-            <asp:GridView ID="gvOrderItem" runat="server" DataKeyNames="Id" OnSelectedIndexChanged="GvOrderItem_Delete" >
+            <asp:GridView ID="gvOrderItem" runat="server" DataKeyNames="Id,OrderId,ItemName,Qty" OnRowDeleting="GvOrderItem_Delete">
                 <Columns>
-                    <asp:CommandField HeaderText="Delete" ShowSelectButton="true" />
+                    <asp:CommandField HeaderText="Delete" ShowDeleteButton="true" />
                 </Columns>
-            </asp:GridView><br/>
+            </asp:GridView>
+            <br />
         </div>
 
         <br />

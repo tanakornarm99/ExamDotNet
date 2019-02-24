@@ -15,30 +15,31 @@ namespace BasicCSharp
     public partial class WebFormExample : System.Web.UI.Page
     {
         private string conString = ConfigurationManager.ConnectionStrings["ConnectionString"].ToString();
+        public static string CONTSTANT_OrderID = string.Empty;
+        public static string CONTSTANT_CatID = string.Empty;
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
-                DataTable getCategory = GetAllCategory();
-                gvCategory.DataSource = getCategory;
+                DataTable dtCategory = GetAllCategory();
+                gvCategory.DataSource = dtCategory;
                 gvCategory.DataBind();
 
-                DataTable getItem = GetAllItem();
-                gvItem.DataSource = getItem;
+                DataTable dtItem = GetAllItem();
+                gvItem.DataSource = dtItem;
                 gvItem.DataBind();
 
-                DataTable getOrder = GetAllOrder();
-                gvOrder.DataSource = getOrder;
+                DataTable dtOrder = GetAllOrder();
+                gvOrder.DataSource = dtOrder;
                 gvOrder.DataBind();
 
-                DataTable getCatId = GetAllCategory();
-                ddlCategory.DataSource = getCatId;
+                DataTable dtDDLCategory = GetAllCategory();
+                ddlCategory.DataSource = dtDDLCategory;
                 ddlCategory.DataValueField = "Id";
                 ddlCategory.DataTextField = "Name";
                 ddlCategory.DataBind();
 
                 lblOrderNo.Text = GetOrderNumber(); //make orderNo.
-
             }
         }
 
@@ -50,17 +51,10 @@ namespace BasicCSharp
             {
                 if (CategoryIsNotExist(categoryName.Trim()))
                 {
-                    using (SqlConnection connection = new SqlConnection(conString))
-                    {
-                        connection.Open();
-                        SqlCommand cmd = new SqlCommand();
-                        cmd.Connection = connection;
-                        cmd.CommandType = CommandType.Text;
-                        cmd.CommandText = "INSERT INTO [Category] (Name) VALUES (@name)";
-                        cmd.Parameters.AddWithValue("@name", categoryName);
-                        cmd.ExecuteNonQuery();
-                        connection.Close();
-                    }
+                    string cmdText = "INSERT INTO [Category] (Name) VALUES (@name)";
+                    List<Param> parameters = new List<Param>();
+                    parameters.Add(SetParam("name", categoryName));
+                    ExecuteQuery(cmdText, parameters);
                 }
             }
             ClearCategory(sender, e);
@@ -70,7 +64,6 @@ namespace BasicCSharp
         protected void UpdateCategory(object sender, EventArgs e)
         {
             string categoryName = txtCategory.Text;
-
             if (!string.IsNullOrEmpty(categoryName))
             {
                 string categoryId = lblCategoryId.Text;
@@ -78,19 +71,11 @@ namespace BasicCSharp
                 {
                     string categoryOldName = GetCategoryName(categoryId);
                     UpdateCategoryOrderItem(categoryOldName, categoryName);
-
-                    using (SqlConnection connection = new SqlConnection(conString))
-                    {
-                        connection.Open();
-                        SqlCommand cmd = new SqlCommand();
-                        cmd.Connection = connection;
-                        cmd.CommandType = CommandType.Text;
-                        cmd.CommandText = "UPDATE [Category] SET Name = @name WHERE Id = @catId ";
-                        cmd.Parameters.AddWithValue("@name", categoryName);
-                        cmd.Parameters.AddWithValue("@catId", categoryId);
-                        cmd.ExecuteNonQuery();
-                        connection.Close();
-                    }
+                    string cmdText = "UPDATE [Category] SET Name = @name WHERE Id = @catId";
+                    List<Param> parameters = new List<Param>();
+                    parameters.Add(SetParam("name", categoryName));
+                    parameters.Add(SetParam("catId", categoryId));
+                    ExecuteQuery(cmdText, parameters);
                 }
             }
             ClearCategory(sender, e);
@@ -99,67 +84,37 @@ namespace BasicCSharp
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
         }
 
-
-
         private void UpdateCategoryOrderItem(string cateOldName, string cateNewName)
         {
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "UPDATE [OrderItem] SET Category = @cateNewName WHERE Category = @cateOldName ";
-                cmd.Parameters.AddWithValue("@cateNewName", cateNewName);
-                cmd.Parameters.AddWithValue("@cateOldName", cateOldName);
-                cmd.ExecuteNonQuery();
-                connection.Close();
-            }
+            string cmdText = "UPDATE [OrderItem] SET Category = @cateNewName WHERE Category = @cateOldName";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("cateNewName", cateNewName));
+            parameters.Add(SetParam("cateOldName", cateOldName));
+            ExecuteQuery(cmdText, parameters);
         }
 
         private void DeleteCategory(string catId)
         {
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "DELETE FROM [Category] WHERE Id = @categoryId";
-                cmd.Parameters.AddWithValue("@categoryId", catId);
-                cmd.ExecuteNonQuery();
-                connection.Close();
-            }
+            string cmdText = "DELETE FROM [Category] WHERE Id = @categoryId";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("categoryId", catId));
+            ExecuteQuery(cmdText, parameters);
         }
 
         private void DeleteCategoryItem(string catId)
         {
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "DELETE FROM [Item] WHERE CategoryId = @catId";
-                cmd.Parameters.AddWithValue("@catId", catId);
-                cmd.ExecuteNonQuery();
-                connection.Close();
-            }
+            string cmdText = "DELETE FROM [Item] WHERE CategoryId = @catId";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("catId", catId));
+            ExecuteQuery(cmdText, parameters);
         }
 
         private void DeleteCategoryOrderItem(string categoryName)
         {
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "DELETE FROM [OrderItem] WHERE Category = @categoryName";
-                cmd.Parameters.AddWithValue("@categoryName", categoryName);
-                cmd.ExecuteNonQuery();
-                connection.Close();
-            }
+            string cmdText = "DELETE FROM [OrderItem] WHERE Category = @categoryName";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("categoryName", categoryName));
+            ExecuteQuery(cmdText, parameters);
         }
 
         protected void AddItem(object sender, EventArgs e)
@@ -167,24 +122,16 @@ namespace BasicCSharp
             string itemName = txtItemName.Text;
             string itemPrice = txtItemPrice.Text;
             int categoryId = Convert.ToInt32(ddlCategory.SelectedValue);
-
             if (!string.IsNullOrEmpty(itemName) && categoryId != 0)
             {
                 if (ItemIsNotExist(itemName.Trim()))
                 {
-                    using (SqlConnection connection = new SqlConnection(conString))
-                    {
-                        connection.Open();
-                        SqlCommand cmd = new SqlCommand();
-                        cmd.Connection = connection;
-                        cmd.CommandType = CommandType.Text;
-                        cmd.CommandText = "INSERT INTO [Item] (Name,Price,CategoryId) VALUES (@name,@price,@categoryId)";
-                        cmd.Parameters.AddWithValue("@name", itemName);
-                        cmd.Parameters.AddWithValue("@price", itemPrice);
-                        cmd.Parameters.AddWithValue("@categoryId", categoryId);
-                        cmd.ExecuteNonQuery();
-                        connection.Close();
-                    }
+                    string cmdText = "INSERT INTO [Item] (Name,Price,CategoryId) VALUES (@name,@price,@categoryId)";
+                    List<Param> parameters = new List<Param>();
+                    parameters.Add(SetParam("name", itemName));
+                    parameters.Add(SetParam("price", itemPrice));
+                    parameters.Add(SetParam("categoryId", categoryId));
+                    ExecuteQuery(cmdText, parameters);
                 }
             }
             ClearItem(sender, e);
@@ -196,27 +143,22 @@ namespace BasicCSharp
             string itemId = lblItemId.Text;
             string itemName = txtItemName.Text;
             string itemPrice = txtItemPrice.Text;
-            int categoryId = Convert.ToInt32(ddlCategory.SelectedValue);
-
-            if (!string.IsNullOrEmpty(itemName) && categoryId != 0)
+            string categoryId = ddlCategory.SelectedValue.ToString();
+            if (!string.IsNullOrEmpty(itemName) && categoryId != null)
             {
                 string itemOldName = GetItemName(itemId);
-                UpdateItemNameOrderItem(itemOldName, itemName);
-
-                using (SqlConnection connection = new SqlConnection(conString))
-                {
-                    connection.Open();
-                    SqlCommand cmd = new SqlCommand();
-                    cmd.Connection = connection;
-                    cmd.CommandType = CommandType.Text;
-                    cmd.CommandText = "UPDATE [Item] SET Name = @name, Price = @price, CategoryId = @catId WHERE Id = @itemId";
-                    cmd.Parameters.AddWithValue("@itemId", itemId);
-                    cmd.Parameters.AddWithValue("@name", itemName);
-                    cmd.Parameters.AddWithValue("@price", itemPrice);
-                    cmd.Parameters.AddWithValue("@catId", categoryId);
-                    cmd.ExecuteNonQuery();
-                    connection.Close();
-                }
+                UpdateItemNameOrderItem(itemOldName, itemName); // focus
+                string categoryOldName = GetCategoryName(CONTSTANT_CatID); //Set CONTSTANT_CatID from Method GvItem_Selected 
+                string categoryNewName = GetCategoryName(categoryId);
+                UpdateCategoryOrderItem(categoryOldName, categoryNewName);
+                UpdatePriceOrderItem(itemName, itemPrice);
+                string cmdText = "UPDATE [Item] SET Name = @name, Price = @price, CategoryId = @catId WHERE Id = @itemId";
+                List<Param> parameters = new List<Param>();
+                parameters.Add(SetParam("itemId", itemId));
+                parameters.Add(SetParam("name", itemName));
+                parameters.Add(SetParam("price", itemPrice));
+                parameters.Add(SetParam("catId", categoryId));
+                ExecuteQuery(cmdText, parameters);
             }
             ClearItem(sender, e);
             btnAddItem.Visible = true;
@@ -224,50 +166,56 @@ namespace BasicCSharp
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
         }
 
+        private void UpdatePriceOrderItem(string itemName, string itemPrice)
+        {
+            //GetAllQtyOrderItem
+            string paraPrice = string.Empty;
+            string cmdText = "SELECT * FROM [OrderItem] WHERE ItemName = @itemName";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("itemName", itemName));
+            DataTable dt = ExecuteQueryWithResult(cmdText, parameters);
+            double newPrice = Convert.ToDouble(itemPrice);
+            string[] arryId = new string[dt.Rows.Count];
+            double[] arryQty = new double[dt.Rows.Count];
+            double[] arrySumPrice = new double[dt.Rows.Count];
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                arryId[i] = dt.Rows[i]["Id"].ToString();
+                arryQty[i] = Convert.ToInt32(dt.Rows[i]["Qty"]);
+                arrySumPrice[i] = arryQty[i] * newPrice;
+                string cmd = "UPDATE [OrderItem] SET Price = @newPrice WHERE ItemName = @itemName AND Id = @arryId";
+                List<Param> paramety = new List<Param>();
+                paramety.Add(SetParam("newPrice", arrySumPrice[i]));
+                paramety.Add(SetParam("itemName", itemName));
+                paramety.Add(SetParam("arryId", arryId[i]));
+                ExecuteQuery(cmd, paramety);
+            }
+
+        }
+
         private void UpdateItemNameOrderItem(string itemOldName, string itemNewName)
         {
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "UPDATE [OrderItem] SET ItemName = @itemNewName WHERE ItemName = @itemOldName ";
-                cmd.Parameters.AddWithValue("@itemNewName", itemNewName);
-                cmd.Parameters.AddWithValue("@itemOldName", itemOldName);
-                cmd.ExecuteNonQuery();
-                connection.Close();
-            }
+            string cmdText = "UPDATE [OrderItem] SET ItemName = @itemNewName WHERE ItemName = @itemOldName";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("itemNewName", itemNewName));
+            parameters.Add(SetParam("itemOldName", itemOldName));
+            ExecuteQuery(cmdText, parameters);
         }
 
         private void DeleteItem(string itemId)
         {
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "DELETE FROM [Item] WHERE Id = @itemId";
-                cmd.Parameters.AddWithValue("@itemId", itemId);
-                cmd.ExecuteNonQuery();
-                connection.Close();
-            }
+            string cmdText = "DELETE FROM [Item] WHERE Id = @itemId";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("itemId", itemId));
+            ExecuteQuery(cmdText, parameters);
         }
 
         private void DeleteItemOrderItem(string itemName)
         {
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "DELETE FROM [OrderItem] WHERE ItemName = @itemName";
-                cmd.Parameters.AddWithValue("@itemName", itemName);
-                cmd.ExecuteNonQuery();
-                connection.Close();
-            }
+            string cmdText = "DELETE FROM [OrderItem] WHERE ItemName = @itemName";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("itemName", itemName));
+            ExecuteQuery(cmdText, parameters);
         }
 
         protected void AddOrder(object sender, EventArgs e)
@@ -275,26 +223,18 @@ namespace BasicCSharp
             double sumPrice = 0;
             string firstName = txtFirstname.Text;
             string orderNumber = lblOrderNo.Text;
-            //string date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             string date = DateTime.Now.ToString();
             if (!string.IsNullOrEmpty(firstName))
             {
                 if (ItemIsNotExist(firstName.Trim()))
                 {
-                    using (SqlConnection connection = new SqlConnection(conString))
-                    {
-                        connection.Open();
-                        SqlCommand cmd = new SqlCommand();
-                        cmd.Connection = connection;
-                        cmd.CommandType = CommandType.Text;
-                        cmd.CommandText = "INSERT INTO [Order] (OrderNumber,[From],SummaryPrice,Date) VALUES (@orderNumber,@from,@sumPrice,@date)";
-                        cmd.Parameters.AddWithValue("@orderNumber", orderNumber);
-                        cmd.Parameters.AddWithValue("@from", firstName);
-                        cmd.Parameters.AddWithValue("@sumPrice", sumPrice);
-                        cmd.Parameters.AddWithValue("@date", date);
-                        cmd.ExecuteNonQuery();
-                        connection.Close();
-                    }
+                    string cmdText = "INSERT INTO [Order] (OrderNumber,[From],SummaryPrice,Date) VALUES (@orderNumber,@from,@sumPrice,@date)";
+                    List<Param> parameters = new List<Param>();
+                    parameters.Add(SetParam("orderNumber", orderNumber));
+                    parameters.Add(SetParam("from", firstName));
+                    parameters.Add(SetParam("sumPrice", sumPrice));
+                    parameters.Add(SetParam("date", date));
+                    ExecuteQuery(cmdText, parameters);
                 }
             }
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
@@ -302,389 +242,222 @@ namespace BasicCSharp
 
         protected void UpdateOrder(object sender, EventArgs e)
         {
-            int orderId = Convert.ToInt32(lblOrderId.Text);
-            string orderNumber = lblOrderNo.Text;
+            string orderId = CONTSTANT_OrderID;
+            //int orderId = Convert.ToInt32(lblOrderId.Text);
             string name = txtFirstname.Text;
             double orderPrice = Convert.ToDouble(lblOrderPrice.Text);
             string date = DateTime.Now.ToString();
-
             if (!string.IsNullOrEmpty(name))
             {
-                using (SqlConnection connection = new SqlConnection(conString))
-                {
-                    connection.Open();
-                    SqlCommand cmd = new SqlCommand();
-                    cmd.Connection = connection;
-                    cmd.CommandType = CommandType.Text;
-                    cmd.CommandText = "UPDATE [Order] SET [From] = @name, Date = @date WHERE Id = @orderId ";
-                    //cmd.CommandText = "UPDATE [Order] SET OrderNumber =@, From =@, SummaryPrice=@ WHERE Id = @orderId ";
-                    cmd.Parameters.AddWithValue("@name", name);
-                    cmd.Parameters.AddWithValue("@orderId", orderId);
-                    cmd.Parameters.AddWithValue("@date", date);
-                    cmd.ExecuteNonQuery();
-                    connection.Close();
-                }
+                string cmdText = "UPDATE [Order] SET [From] = @name, Date = @date WHERE Id = @orderId";
+                List<Param> parameters = new List<Param>();
+                parameters.Add(SetParam("name", name));
+                parameters.Add(SetParam("orderId", orderId));
+                parameters.Add(SetParam("date", date));
+                ExecuteQuery(cmdText, parameters);
             }
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
         }
 
-        private void DeleteOrder(string orderID)
+        private void DeleteOrder(string orderId)
         {
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "DELETE FROM [Order] WHERE [Id] = @orderID ";
-                cmd.Parameters.AddWithValue("@orderID", orderID);
-                cmd.ExecuteNonQuery();
-                connection.Close();
-            }
+            string cmdText = "DELETE FROM [Order] WHERE [Id] = @orderID";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("orderId", orderId));
+            ExecuteQuery(cmdText, parameters);
         }
 
-        private int AddOrderItemExist(string orderID, string itemName, string itemPrice, string category)
+        private void AddOrderItemExist(string orderId, string itemName, string itemPrice, string category)
         {
             int itemQty = 0, sumQty = 0;
             double sumPrice, priceItem = Convert.ToDouble(itemPrice); ;
-            //double Price = Convert.ToDouble(itemPrice);
-            using (SqlConnection connection = new SqlConnection(conString))
+            string cmdText = "SELECT * FROM [OrderItem] WHERE OrderId = @orderId AND ItemName = @itemName";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("orderId", orderId));
+            parameters.Add(SetParam("itemName", itemName));
+            DataTable dt = ExecuteQueryWithResult(cmdText, parameters);
+            if (dt.Rows.Count > 0)
             {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "SELECT * FROM [OrderItem] WHERE OrderId = @orderId AND ItemName = @itemName";
-                cmd.Parameters.AddWithValue("@orderId", orderID);
-                cmd.Parameters.AddWithValue("@itemName", itemName);
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                if (dt.Rows.Count > 0)
-                {
-                    itemQty = Convert.ToInt32(dt.Rows[0]["Qty"].ToString());
-                    sumQty = itemQty + 1;
-                    sumPrice = priceItem * sumQty;
-                    UpdateOrderItem(orderID, sumQty, sumPrice, itemName);
-                }
-                else
-                {
-                    AddNewOrderItem(orderID, itemName, itemPrice, category);
-                }
+                itemQty = Convert.ToInt32(dt.Rows[0]["Qty"]);
+                sumQty = itemQty + 1;
+                sumPrice = priceItem * sumQty;
+                UpdateOrderItem(orderId, sumQty, sumPrice, itemName);
             }
-            return 0;
+            else
+            {
+                AddNewOrderItem(orderId, itemName, itemPrice, category);
+            }
         }
 
-        private int AddNewOrderItem(string orderID, string itemName, string itemPrice, string category)
+        private void AddNewOrderItem(string orderId, string itemName, string itemPrice, string category)
         {
             int qty = 1;
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "INSERT INTO [OrderItem] (OrderId,ItemName,Category,Qty,Price) VALUES (@orderID,@itemName,@category,@qty,@price) ";
-                cmd.Parameters.AddWithValue("@orderID", orderID);
-                cmd.Parameters.AddWithValue("@itemName", itemName);
-                cmd.Parameters.AddWithValue("@category", category);
-                cmd.Parameters.AddWithValue("@qty", qty);
-                cmd.Parameters.AddWithValue("@price", itemPrice);
-                cmd.ExecuteNonQuery();
-                connection.Close();
-            }
-            return 0;
+            string cmdText = "INSERT INTO [OrderItem] (OrderId,ItemName,Category,Qty,Price) VALUES (@orderId,@itemName,@category,@qty,@price)";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("orderId", orderId));
+            parameters.Add(SetParam("itemName", itemName));
+            parameters.Add(SetParam("category", category));
+            parameters.Add(SetParam("qty", qty));
+            parameters.Add(SetParam("price", itemPrice));
+            ExecuteQuery(cmdText, parameters);
         }
 
-        private void UpdateOrderItem(string orderID, double sumQty, double sumPrice, string itemName)
+        private void UpdateOrderItem(string orderId, double sumQty, double sumPrice, string itemName)
         {
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "UPDATE [OrderItem] SET Qty = @sumQty, Price = @sumPrice WHERE OrderId = @orderID AND ItemName = @itemName";
-                cmd.Parameters.AddWithValue("@sumQty", sumQty);
-                cmd.Parameters.AddWithValue("@sumPrice", sumPrice);
-                cmd.Parameters.AddWithValue("@orderID", orderID);
-                cmd.Parameters.AddWithValue("@itemName", itemName);
-                cmd.ExecuteNonQuery();
-                connection.Close();
-            }
+            string cmdText = "UPDATE [OrderItem] SET Qty = @sumQty, Price = @sumPrice WHERE OrderId = @orderId AND ItemName = @itemName";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("sumQty", sumQty));
+            parameters.Add(SetParam("sumPrice", sumPrice));
+            parameters.Add(SetParam("orderId", orderId));
+            parameters.Add(SetParam("itemName", itemName));
+            ExecuteQuery(cmdText, parameters);
         }
 
-        private void DeleteOrderItemID(string orderID)
+        private void DeleteOrderItemID(string orderId)
         {
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "DELETE FROM [OrderItem] WHERE [OrderId] = @orderID ";
-                cmd.Parameters.AddWithValue("@orderID", orderID);
-                cmd.ExecuteNonQuery();
-                connection.Close();
-            }
+            string cmdText = "DELETE FROM [OrderItem] WHERE [OrderId] = @orderId";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("orderId", orderId));
+            ExecuteQuery(cmdText, parameters);
         }
 
-        private void DeleteOrderItemName(string orderID, string itemName)
+        private void DeleteOrderItemName(string orderItemId)
         {
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "DELETE FROM [OrderItem] WHERE [OrderId] = @orderID AND [ItemName] = @itemName";
-                cmd.Parameters.AddWithValue("@orderID", orderID);
-                cmd.Parameters.AddWithValue("@itemName", itemName);
-                cmd.ExecuteNonQuery();
-                connection.Close();
-            }
+            string cmdText = "DELETE FROM [OrderItem] WHERE [Id] = @orderItemId";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("orderItemId", orderItemId));
+            ExecuteQuery(cmdText, parameters);
         }
 
-        private void UpdateTotalPrice(string orderID)
+        private void UpdateTotalPrice(string orderId)
         {
             var cultureInfo = Thread.CurrentThread.CurrentCulture;
             var numberFormatInfo = (NumberFormatInfo)cultureInfo.NumberFormat.Clone();
             numberFormatInfo.CurrencySymbol = "฿"; // Replace with "$" or "£" or whatever you need
-            var sumPrice = GetTotalItemPrice(orderID);  //Method GetTotalItemPrice sumPrice
+            var sumPrice = GetTotalItemPrice(orderId);  //Method GetTotalItemPrice sumPrice
             var formattedPrice = sumPrice.ToString("C", numberFormatInfo);
             lblTotalPrice.Text = formattedPrice; //show ฿xxx.xx
-            UpdateOrderSumPrice(orderID, sumPrice); //Method UpdateOrderSumPrice
+            UpdateOrderSumPrice(orderId, sumPrice); //Method UpdateOrderSumPrice
         }
 
-        private void UpdateOrderSumPrice(string orderID, double sumPrice)
+        private void UpdateOrderSumPrice(string orderId, double sumPrice)
         {
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "UPDATE [Order] SET [SummaryPrice] = @sumPrice WHERE [Id] = @orderID";
-                cmd.Parameters.AddWithValue("@orderID", orderID);
-                cmd.Parameters.AddWithValue("@sumPrice", sumPrice);
-                cmd.ExecuteNonQuery();
-                connection.Close();
-            }
-            DataTable getOrder = GetAllOrder();
-            gvOrder.DataSource = getOrder;
-            gvOrder.DataBind();
+            string cmdText = "UPDATE [Order] SET [SummaryPrice] = @sumPrice WHERE [Id] = @orderId";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("orderId", orderId));
+            parameters.Add(SetParam("sumPrice", sumPrice));
+            ExecuteQuery(cmdText, parameters);
         }
 
         private DataTable GetAllItem()
         {
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "SELECT * FROM [Item],[Category] WHERE Item.CategoryId = Category.Id";
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                return dt;
-            }
+            string cmdText = "SELECT * FROM [Item],[Category] WHERE Item.CategoryId = Category.Id";
+            return ExecuteQueryWithResult(cmdText, new List<Param>());
         }
 
         private DataTable GetAllCategory()
         {
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "SELECT * FROM [Category]";
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                return dt;
-            }
+            string cmdText = "SELECT * FROM [Category]";
+            return ExecuteQueryWithResult(cmdText, new List<Param>());
         }
 
         private DataTable GetAllOrder()
         {
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "SELECT * FROM [Order]";
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                return dt;
-            }
+            string cmdText = "SELECT * FROM [Order]";
+            return ExecuteQueryWithResult(cmdText, new List<Param>());
         }
 
-        private DataTable GetAllOrderItem()
+        private DataTable GetAllOrderItem(string orderId)
         {
-            int orderId = Convert.ToInt32(lblOrderId.Text);
-
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "SELECT * FROM [OrderItem] WHERE [OrderItem].orderId = @orderId";
-                cmd.Parameters.AddWithValue("@orderId", orderId);
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                return dt;
-            }
+            string cmdText = "SELECT * FROM [OrderItem] WHERE OrderId = @orderId";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("orderId", orderId));
+            return ExecuteQueryWithResult(cmdText, parameters);
         }
 
         private string GetOrderNumber()
         {
             int length = 4;
-            string orderNo = string.Empty;
-
-            DataTable getOrder = GetAllOrder();
-            if (getOrder.Rows.Count == 0)
-            {
-                orderNo = "ORD2019000000";
-            }
-            else
-            {
-                using (SqlConnection connection = new SqlConnection(conString))
-                {
-                    connection.Open();
-                    SqlCommand cmd = new SqlCommand();
-                    cmd.Connection = connection;
-                    cmd.CommandType = CommandType.Text;
-                    cmd.CommandText = "SELECT TOP 1 OrderNumber FROM [Order] ORDER BY ID DESC";
-                    orderNo = cmd.ExecuteScalar().ToString();
-                }
-            }
-            string subOrderNo = orderNo.Substring(orderNo.Length - 4);
-            int numberOrder = Convert.ToInt32(subOrderNo) + 1;
-            var result = numberOrder.ToString().PadLeft(length, '0');
             DateTime thisDay = DateTime.Today;
+            string orderNo = "ORD2019000000";
+            DataTable dtOrder = GetAllOrder();
+            if (dtOrder.Rows.Count > 0)
+            {
+                string cmdText = "SELECT TOP 1 OrderNumber FROM [Order] ORDER BY ID DESC";
+                orderNo = ExecuteQueryScalar(cmdText, new List<Param>()).ToString();
+            }
+            int subOrderNo = Convert.ToInt32(orderNo.Substring(orderNo.Length - 4)) + 1;
+            var result = subOrderNo.ToString().PadLeft(length, '0');
             string resultOrderNumber = thisDay.ToString("ORD" + "yyyyMM" + result);
             return resultOrderNumber;
         }
 
         private string GetCategoryName(string catId)
         {
-            string categoryName = string.Empty;
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "Select Name From [Category] Where Id = @catId";
-                cmd.Parameters.AddWithValue("@catId", catId);
-                categoryName = cmd.ExecuteScalar().ToString();
-            }
-            return categoryName;
+            string cmdText = "SELECT Name FROM [Category] WHERE Id = @catId";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("catId", catId));
+            return ExecuteQueryScalar(cmdText, parameters).ToString();
         }
 
         private string GetItemName(string itemId)
         {
-            string itemName = string.Empty;
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "Select Name From [Item] Where Id = @itemId";
-                cmd.Parameters.AddWithValue("@itemId", itemId);
-                itemName = cmd.ExecuteScalar().ToString();
-            }
-            return itemName;
+            string cmdText = "SELECT Name FROM [Item] WHERE Id = @itemId";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("itemId", itemId));
+            return ExecuteQueryScalar(cmdText, parameters).ToString();
         }
 
         private string GetItemPrice(string itemName)
         {
-            string itemPrice = string.Empty;
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "SELECT [Price] FROM [Item] WHERE Name = @itemName";
-                cmd.Parameters.AddWithValue("@itemName", itemName);
-                itemPrice = cmd.ExecuteScalar().ToString();
-            }
-            return itemPrice;
+            string cmdText = "SELECT [Price] FROM [Item] WHERE Name = @itemName";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("itemName", itemName));
+            return ExecuteQueryScalar(cmdText, parameters).ToString();
         }
 
-        private double GetTotalItemPrice(string orderID)
+        private double GetTotalItemPrice(string orderId)
         {
             string totalPrice = string.Empty;
             double sumPrice = 0;
-            using (SqlConnection connection = new SqlConnection(conString))
+            string cmdText = "SELECT sum(Price) FROM [OrderItem] WHERE OrderId = @orderId";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("orderId", orderId));
+            totalPrice = ExecuteQueryScalar(cmdText, parameters).ToString();
+            if (!string.IsNullOrEmpty(totalPrice))
             {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "SELECT sum(Price) FROM [OrderItem] WHERE OrderId = @orderID ";
-                cmd.Parameters.AddWithValue("@orderID", orderID);
-                totalPrice = cmd.ExecuteScalar().ToString();
-                if (!string.IsNullOrEmpty(totalPrice))
-                {
-                    sumPrice = Convert.ToDouble(totalPrice);
-                }
+                sumPrice = Convert.ToDouble(totalPrice);
             }
             return sumPrice;
         }
 
         private bool CategoryIsNotExist(string categoryName)
         {
-            using (SqlConnection connection = new SqlConnection(conString))
+            string cmdText = "SELECT Name FROM [Category] WHERE Name = @categoryName";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("categoryName", categoryName));
+            DataTable dt = ExecuteQueryWithResult(cmdText, parameters);
+            if (dt.Rows.Count > 0)
             {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "SELECT Name FROM [Category] WHERE Name = @CategoryName";
-                cmd.Parameters.AddWithValue("@CategoryName", categoryName);
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                if (dt.Rows.Count > 0)
-                {
-                    return false;
-                }
-                return true;
+                return false;
             }
+            return true;
         }
 
         private bool ItemIsNotExist(string itemName)
         {
-            using (SqlConnection connection = new SqlConnection(conString))
+            string cmdText = "SELECT Name FROM [Item] WHERE Name = @itemName";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(SetParam("itemName", itemName));
+            DataTable dt = ExecuteQueryWithResult(cmdText, parameters);
+            if (dt.Rows.Count > 0)
             {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = "SELECT Name FROM [Item] WHERE Name = @itemName";
-                cmd.Parameters.AddWithValue("@itemName", itemName);
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                if (dt.Rows.Count > 0)
-                {
-                    return false;
-                }
+                return false;
             }
             return true;
         }
 
         //EventButton Selete Value
-
         protected void GvCategory_Selected(object sender, EventArgs e)
         {
             GridViewRow row = gvCategory.SelectedRow;
@@ -698,11 +471,9 @@ namespace BasicCSharp
         {
             string catId = gvCategory.DataKeys[e.RowIndex].Value.ToString();
             string categoryName = GetCategoryName(catId);
-
             DeleteCategoryOrderItem(categoryName);
             DeleteCategoryItem(catId);
             DeleteCategory(catId);
-
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
         }
 
@@ -712,9 +483,9 @@ namespace BasicCSharp
             lblItemId.Text = row.Cells[2].Text;
             txtItemName.Text = row.Cells[3].Text;
             txtItemPrice.Text = row.Cells[4].Text;
-            //ddlCategory.SelectedValue = ddlCategory.SelectedItem.Value;
             ddlCategory.SelectedValue = row.Cells[5].Text;
             ddlCategory.SelectedItem.Value = ddlCategory.SelectedValue;
+            CONTSTANT_CatID = ddlCategory.SelectedValue; // SET Global variable
             btnAddItem.Visible = false;
             btnUpdateItem.Visible = true;
         }
@@ -723,25 +494,23 @@ namespace BasicCSharp
         {
             string itemId = gvItem.DataKeys[e.RowIndex].Value.ToString();
             string itemName = GetItemName(itemId);
-
             DeleteItemOrderItem(itemName);
             DeleteItem(itemId);
-
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
         }
 
         protected void GvOrder_Selected(object sender, EventArgs e)
         {
             GridViewRow row = gvOrder.SelectedRow;
-            lblOrderId.Text = row.Cells[2].Text;
+            string orderId = row.Cells[2].Text;
+            CONTSTANT_OrderID = orderId;
             lblOrderNo.Text = row.Cells[3].Text;
             txtFirstname.Text = row.Cells[4].Text;
             lblOrderPrice.Text = row.Cells[5].Text;
+            UpdateTotalPrice(orderId);
 
-            UpdateTotalPrice(lblOrderId.Text);
-
-            DataTable getOrderItem = GetAllOrderItem();
-            gvOrderItem.DataSource = getOrderItem;
+            DataTable dtOrderItem = GetAllOrderItem(orderId);
+            gvOrderItem.DataSource = dtOrderItem;
             gvOrderItem.DataBind();
 
             btnAddOrder.Visible = false;
@@ -761,52 +530,48 @@ namespace BasicCSharp
         protected void GvAddOrderItem_Selected(object sender, EventArgs e)
         {
             GridViewRow row = gvAddOrderItem.SelectedRow;
-            string orderID = lblOrderId.Text;
+            string orderId = CONTSTANT_OrderID;
             string itemName = row.Cells[2].Text;
             string itemPrice = row.Cells[3].Text;
             string category = row.Cells[6].Text;
+            AddOrderItemExist(orderId, itemName, itemPrice, category);
+            UpdateTotalPrice(orderId);
 
-            AddOrderItemExist(orderID, itemName, itemPrice, category);
-            UpdateTotalPrice(orderID);
-
-            DataTable getOrderItem = GetAllOrderItem();
-            gvOrderItem.DataSource = getOrderItem;
+            DataTable dtOrderItem = GetAllOrderItem(orderId);
+            gvOrderItem.DataSource = dtOrderItem;
             gvOrderItem.DataBind();
         }
 
-        protected void GvOrderItem_Delete(object sender, EventArgs e)
+        protected void GvOrderItem_Delete(object sender, GridViewDeleteEventArgs e)
         {
-            GridViewRow row = gvOrderItem.SelectedRow;
-            string orderID = row.Cells[2].Text;
-            string itemName = row.Cells[3].Text;
-            string qty = row.Cells[5].Text;
+            string orderItemId = gvOrderItem.DataKeys[e.RowIndex].Values[0].ToString();
+            string orderId = gvOrderItem.DataKeys[e.RowIndex].Values[1].ToString();
+            string itemName = gvOrderItem.DataKeys[e.RowIndex].Values[2].ToString();
+            string qty = gvOrderItem.DataKeys[e.RowIndex].Values[3].ToString();
             int sumQty = Convert.ToInt32(qty);
             double sumPrice, itemPrice = 0;
-
             if (sumQty > 1)
             {
                 itemPrice = Convert.ToDouble(GetItemPrice(itemName));
                 sumQty = sumQty - 1;
                 sumPrice = sumQty * itemPrice;
-                UpdateOrderItem(orderID, sumQty, sumPrice, itemName);
+                UpdateOrderItem(orderId, sumQty, sumPrice, itemName);
             }
             else
             {
-                DeleteOrderItemName(orderID, itemName);
+                DeleteOrderItemName(orderItemId);
             }
-
-            UpdateTotalPrice(orderID);
-
-            DataTable getOrderItem = GetAllOrderItem();
-            gvOrderItem.DataSource = getOrderItem;
+            UpdateTotalPrice(orderId);
+            DataTable dtOrderItem = GetAllOrderItem(orderId);
+            gvOrderItem.DataSource = dtOrderItem;
             gvOrderItem.DataBind();
         }
 
         protected void AddOrderItem_Click(object sender, EventArgs e)
         {
             lblGvAddItem.Visible = true;
-            DataTable getItem = GetAllItem();
-            gvAddOrderItem.DataSource = getItem;
+            DataTable dtItem = GetAllItem();
+            gvAddOrderItem.DataSource = dtItem;
             gvAddOrderItem.DataBind();
         }
 
@@ -835,8 +600,80 @@ namespace BasicCSharp
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
         }
 
+        private void ExecuteQuery(string commandText, List<Param> parameters)
+        {
+            using (SqlConnection connection = new SqlConnection(conString))
+            {
+                connection.Open();
+                SqlCommand cmd = new SqlCommand
+                {
+                    Connection = connection,
+                    CommandText = commandText,
+                    CommandType = CommandType.Text
+                };
+                foreach (var item in parameters)
+                {
+                    cmd.Parameters.AddWithValue("@" + item.Key, item.value);
+                }
+                cmd.ExecuteNonQuery();
+            }
+        }   //Insert Update Delete 
 
+        private object ExecuteQueryScalar(string commandText, List<Param> parameters)
+        {
+            using (SqlConnection connection = new SqlConnection(conString))
+            {
+                connection.Open();
+                SqlCommand cmd = new SqlCommand
+                {
+                    Connection = connection,
+                    CommandText = commandText,
+                    CommandType = CommandType.Text
+                };
+                foreach (var item in parameters)
+                {
+                    cmd.Parameters.AddWithValue("@" + item.Key, item.value);
+                }
+                return cmd.ExecuteScalar();
+            }
+        }   //get ExecuteScalar
 
+        private DataTable ExecuteQueryWithResult(string commandText, List<Param> parameters)
+        {
+            using (SqlConnection connection = new SqlConnection(conString))
+            {
+                connection.Open();
+                SqlCommand cmd = new SqlCommand
+                {
+                    Connection = connection,
+                    CommandText = commandText,
+                    CommandType = CommandType.Text
+                };
+                foreach (var item in parameters)
+                {
+                    cmd.Parameters.AddWithValue("@" + item.Key, item.value);
+                }
+                DataTable dt = new DataTable();
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(dt);
+                return dt;
+            }
+        }   //get datatable
 
-    }
-}
+        private Param SetParam(string key, Object value)
+        {
+            return new Param
+            {
+                Key = key,
+                value = value
+            };
+        } //Set Parameter
+
+    } //class WebFormExample
+
+    public class Param
+    {
+        public string Key { get; set; }
+        public object value { get; set; }
+    }  //Object Param SET KEY,VALUE
+}//End
