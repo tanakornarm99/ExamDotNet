@@ -219,9 +219,13 @@ namespace BasicCSharp
         protected void AddOrder(object sender, EventArgs e)
         {
             double sumPrice = 0;
-            string firstName = txtFirstname.Text;
-            string orderNumber = lblOrderNo.Text;
             string date = DateTime.Now.ToString();
+            string orderNumber = lblOrderNo.Text;
+            string firstName = txtFirstname.Text.Trim();
+            string sureName = txtSurename.Text.Trim();
+            string contact = txtContact.Text.Trim();
+            string email = txtEmail.Text.Trim();
+            string nameFrom = firstName + " " + sureName;
             if (!string.IsNullOrEmpty(firstName))
             {
                 if (ItemIsNotExist(firstName.Trim()))
@@ -229,7 +233,7 @@ namespace BasicCSharp
                     string cmdText = "INSERT INTO [Order] (OrderNumber,[From],SummaryPrice,Date) VALUES (@orderNumber,@from,@sumPrice,@date)";
                     List<Param> parameters = new List<Param>();
                     parameters.Add(SetParam("orderNumber", orderNumber));
-                    parameters.Add(SetParam("from", firstName));
+                    parameters.Add(SetParam("from", nameFrom));
                     parameters.Add(SetParam("sumPrice", sumPrice));
                     parameters.Add(SetParam("date", date));
                     ExecuteQuery(cmdText, parameters);
@@ -508,7 +512,7 @@ namespace BasicCSharp
             CONTSTANT_OrderID = orderId;
             lblOrderNo.Text = row.Cells[3].Text;
             txtFirstname.Text = row.Cells[4].Text;
-            lblOrderPrice.Text = row.Cells[5].Text;
+            //lblOrderPrice.Text = row.Cells[5].Text;
 
             ShowTotalPrice(orderId);
 

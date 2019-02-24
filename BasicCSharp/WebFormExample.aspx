@@ -73,27 +73,26 @@
         </div>
         <div class="container">
             <asp:Label Text="Order No :" runat="server" />
-            <asp:Label ID="lblOrderPrice" runat="server" Visible="false" />
             <asp:Label ID="lblOrderNo" runat="server" CssClass="col-sm-3" />
-            <asp:Label Text="Name :" runat="server" />
-            <asp:TextBox ID="txtFirstname" runat="server" CssClass="col-sm-3" />
+            <%--<asp:Label Text="Name :" runat="server" />
+            <asp:TextBox ID="txtFirstname" runat="server" CssClass="col-sm-3" />--%>
             <asp:Button ID="btnAddOrder" Text="Add Order" runat="server" CssClass="btn btn-primary" OnClick="AddOrder" />
             <asp:Button ID="btnUpdateOrder" Text="Update Order" runat="server" CssClass="btn btn-primary" OnClick="UpdateOrder" Visible="false" />
             <asp:Button ID="btnClearOrder" Text="Cancel" runat="server" CssClass="btn btn-danger" OnClick="ClearOrder" /><br />
         </div>
-        <%--<div class="container">
-            <asp:Label Text="First name :" runat="server" />
+        <div class="container">
+            <asp:Label Text="Firstname :" runat="server" />
             <asp:TextBox ID="txtFirstname" runat="server" CssClass="col-sm-3" />
-            <asp:Label Text="Last name :" runat="server" CssClass="col-sm-2" />
-            <asp:TextBox ID="txtLastname" runat="server" CssClass="col-sm-3" ReadOnly="true" /><br />
+            <asp:Label Text="Surename :" runat="server" CssClass="col-sm-2" />
+            <asp:TextBox ID="txtSurename" runat="server" CssClass="col-sm-3" /><br />
             <br />
-        </div>--%>
-        <%--<div class="container">
+        </div>
+        <div class="container">
             <asp:Label Text="Contact No :" runat="server" />
-            <asp:TextBox ID="txtContact" runat="server" CssClass="col-sm-3" ReadOnly="true" />
+            <asp:TextBox ID="txtContact" runat="server" CssClass="col-sm-3" />
             <asp:Label Text="E-mail :" runat="server" CssClass="col-sm-2" />
-            <asp:TextBox ID="txtEmail" runat="server" CssClass="col-sm-3" ReadOnly="true" /><br/><br/>
-        </div>--%>
+            <asp:TextBox ID="txtEmail" runat="server" CssClass="col-sm-3" /><br/><br/>
+        </div>
         <div class="container">
             <asp:Button ID="btnAddOrderItem" Text="Add Item" runat="server" CssClass="btn btn-primary" OnClick="AddOrderItem_Click" Visible="false" />
             <asp:Label ID="lblTotaltxt" Text="Total :" runat="server" CssClass="col-sm-3" Visible="false" />
