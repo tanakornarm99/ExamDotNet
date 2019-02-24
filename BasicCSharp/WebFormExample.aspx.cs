@@ -226,10 +226,8 @@ namespace BasicCSharp
             string contact = txtContact.Text.Trim();
             string email = txtEmail.Text.Trim();
             string nameFrom = firstName + " " + sureName;
-            if (!string.IsNullOrEmpty(firstName))
+            if (!string.IsNullOrEmpty(firstName) && !string.IsNullOrEmpty(sureName))
             {
-                if (ItemIsNotExist(firstName.Trim()))
-                {
                     string cmdText = "INSERT INTO [Order] (OrderNumber,[From],SummaryPrice,Date) VALUES (@orderNumber,@from,@sumPrice,@date)";
                     List<Param> parameters = new List<Param>();
                     parameters.Add(SetParam("orderNumber", orderNumber));
@@ -237,7 +235,14 @@ namespace BasicCSharp
                     parameters.Add(SetParam("sumPrice", sumPrice));
                     parameters.Add(SetParam("date", date));
                     ExecuteQuery(cmdText, parameters);
-                }
+
+                    string cmd = "INSERT INTO [Customer] (Firstname,Surename,Contact,Email) VALUES (@firstName,@sureName,@contact,@email)";
+                    List<Param> paramety = new List<Param>();
+                    paramety.Add(SetParam("firstName", firstName));
+                    paramety.Add(SetParam("sureName", sureName));
+                    paramety.Add(SetParam("contact", contact));
+                    paramety.Add(SetParam("email", email));
+                    ExecuteQuery(cmd, paramety);
             }
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
         }
@@ -261,7 +266,7 @@ namespace BasicCSharp
 
         private void ShowTotalPrice(string orderId)
         {
-            var sumPrice = GetTotalItemPrice(orderId); 
+            var sumPrice = GetTotalItemPrice(orderId);
             var cultureInfo = Thread.CurrentThread.CurrentCulture;
             var numberFormatInfo = (NumberFormatInfo)cultureInfo.NumberFormat.Clone();
             numberFormatInfo.CurrencySymbol = "฿"; // Replace with "$" or "£" or whatever you need
