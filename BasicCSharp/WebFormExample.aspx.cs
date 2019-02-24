@@ -22,6 +22,10 @@ namespace BasicCSharp
             if (!IsPostBack)
             {
                 DataTable dtCategory = GetAllCategory();
+                ddlCategory.DataSource = dtCategory;
+                ddlCategory.DataValueField = "Id";
+                ddlCategory.DataTextField = "Name";
+                ddlCategory.DataBind();
                 gvCategory.DataSource = dtCategory;
                 gvCategory.DataBind();
 
@@ -29,15 +33,10 @@ namespace BasicCSharp
                 gvItem.DataSource = dtItem;
                 gvItem.DataBind();
 
+                UpdateOrderSumPriceAll();
                 DataTable dtOrder = GetAllOrder();
                 gvOrder.DataSource = dtOrder;
                 gvOrder.DataBind();
-
-                DataTable dtDDLCategory = GetAllCategory();
-                ddlCategory.DataSource = dtDDLCategory;
-                ddlCategory.DataValueField = "Id";
-                ddlCategory.DataTextField = "Name";
-                ddlCategory.DataBind();
 
                 lblOrderNo.Text = GetOrderNumber(); //make orderNo.
             }
@@ -147,11 +146,11 @@ namespace BasicCSharp
             if (!string.IsNullOrEmpty(itemName) && categoryId != null)
             {
                 string itemOldName = GetItemName(itemId);
-                UpdateItemNameOrderItem(itemOldName, itemName); // focus
-                string categoryOldName = GetCategoryName(CONTSTANT_CatID); //Set CONTSTANT_CatID from Method GvItem_Selected 
                 string categoryNewName = GetCategoryName(categoryId);
-                UpdateCategoryOrderItem(categoryOldName, categoryNewName);
+                string categoryOldName = GetCategoryName(CONTSTANT_CatID); //Set CONTSTANT_CatID from Method GvItem_Selected 
                 UpdatePriceOrderItem(itemName, itemPrice);
+                UpdateItemNameOrderItem(itemOldName, itemName);
+                UpdateCategoryOrderItem(categoryOldName, categoryNewName);
                 string cmdText = "UPDATE [Item] SET Name = @name, Price = @price, CategoryId = @catId WHERE Id = @itemId";
                 List<Param> parameters = new List<Param>();
                 parameters.Add(SetParam("itemId", itemId));
@@ -190,7 +189,6 @@ namespace BasicCSharp
                 paramety.Add(SetParam("arryId", arryId[i]));
                 ExecuteQuery(cmd, paramety);
             }
-
         }
 
         private void UpdateItemNameOrderItem(string itemOldName, string itemNewName)
@@ -243,20 +241,44 @@ namespace BasicCSharp
         protected void UpdateOrder(object sender, EventArgs e)
         {
             string orderId = CONTSTANT_OrderID;
-            //int orderId = Convert.ToInt32(lblOrderId.Text);
-            string name = txtFirstname.Text;
-            double orderPrice = Convert.ToDouble(lblOrderPrice.Text);
             string date = DateTime.Now.ToString();
+            string name = txtFirstname.Text;
             if (!string.IsNullOrEmpty(name))
             {
                 string cmdText = "UPDATE [Order] SET [From] = @name, Date = @date WHERE Id = @orderId";
                 List<Param> parameters = new List<Param>();
                 parameters.Add(SetParam("name", name));
-                parameters.Add(SetParam("orderId", orderId));
                 parameters.Add(SetParam("date", date));
+                parameters.Add(SetParam("orderId", orderId));
                 ExecuteQuery(cmdText, parameters);
             }
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
+        }
+
+        private void ShowTotalPrice(string orderId)
+        {
+            var sumPrice = GetTotalItemPrice(orderId); 
+            var cultureInfo = Thread.CurrentThread.CurrentCulture;
+            var numberFormatInfo = (NumberFormatInfo)cultureInfo.NumberFormat.Clone();
+            numberFormatInfo.CurrencySymbol = "฿"; // Replace with "$" or "£" or whatever you need
+            var formattedPrice = sumPrice.ToString("C", numberFormatInfo);
+            lblTotalPrice.Text = formattedPrice; //show ฿xxx.xx
+        }
+
+        private void UpdateOrderSumPriceAll()
+        {
+            DataTable dt = GetAllOrder();
+            string[] arryOrderId = new string[dt.Rows.Count];
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                arryOrderId[i] = dt.Rows[i]["Id"].ToString();
+                var sumPrice = GetTotalItemPrice(arryOrderId[i]);
+                string cmdText = "UPDATE [Order] SET [SummaryPrice] = @sumPrice WHERE [Id] = @orderId";
+                List<Param> parameters = new List<Param>();
+                parameters.Add(SetParam("orderId", arryOrderId[i]));
+                parameters.Add(SetParam("sumPrice", sumPrice));
+                ExecuteQuery(cmdText, parameters);
+            }
         }
 
         private void DeleteOrder(string orderId)
@@ -326,26 +348,6 @@ namespace BasicCSharp
             string cmdText = "DELETE FROM [OrderItem] WHERE [Id] = @orderItemId";
             List<Param> parameters = new List<Param>();
             parameters.Add(SetParam("orderItemId", orderItemId));
-            ExecuteQuery(cmdText, parameters);
-        }
-
-        private void UpdateTotalPrice(string orderId)
-        {
-            var cultureInfo = Thread.CurrentThread.CurrentCulture;
-            var numberFormatInfo = (NumberFormatInfo)cultureInfo.NumberFormat.Clone();
-            numberFormatInfo.CurrencySymbol = "฿"; // Replace with "$" or "£" or whatever you need
-            var sumPrice = GetTotalItemPrice(orderId);  //Method GetTotalItemPrice sumPrice
-            var formattedPrice = sumPrice.ToString("C", numberFormatInfo);
-            lblTotalPrice.Text = formattedPrice; //show ฿xxx.xx
-            UpdateOrderSumPrice(orderId, sumPrice); //Method UpdateOrderSumPrice
-        }
-
-        private void UpdateOrderSumPrice(string orderId, double sumPrice)
-        {
-            string cmdText = "UPDATE [Order] SET [SummaryPrice] = @sumPrice WHERE [Id] = @orderId";
-            List<Param> parameters = new List<Param>();
-            parameters.Add(SetParam("orderId", orderId));
-            parameters.Add(SetParam("sumPrice", sumPrice));
             ExecuteQuery(cmdText, parameters);
         }
 
@@ -507,7 +509,8 @@ namespace BasicCSharp
             lblOrderNo.Text = row.Cells[3].Text;
             txtFirstname.Text = row.Cells[4].Text;
             lblOrderPrice.Text = row.Cells[5].Text;
-            UpdateTotalPrice(orderId);
+
+            ShowTotalPrice(orderId);
 
             DataTable dtOrderItem = GetAllOrderItem(orderId);
             gvOrderItem.DataSource = dtOrderItem;
@@ -535,7 +538,7 @@ namespace BasicCSharp
             string itemPrice = row.Cells[3].Text;
             string category = row.Cells[6].Text;
             AddOrderItemExist(orderId, itemName, itemPrice, category);
-            UpdateTotalPrice(orderId);
+            ShowTotalPrice(orderId);
 
             DataTable dtOrderItem = GetAllOrderItem(orderId);
             gvOrderItem.DataSource = dtOrderItem;
@@ -561,7 +564,7 @@ namespace BasicCSharp
             {
                 DeleteOrderItemName(orderItemId);
             }
-            UpdateTotalPrice(orderId);
+            ShowTotalPrice(orderId);
             DataTable dtOrderItem = GetAllOrderItem(orderId);
             gvOrderItem.DataSource = dtOrderItem;
             gvOrderItem.DataBind();
@@ -669,7 +672,7 @@ namespace BasicCSharp
             };
         } //Set Parameter
 
-    } //class WebFormExample
+    } //End class WebFormExample
 
     public class Param
     {

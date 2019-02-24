@@ -73,7 +73,6 @@
         </div>
         <div class="container">
             <asp:Label Text="Order No :" runat="server" />
-            <%--<asp:Label ID="lblOrderId" runat="server" Visible="false" />--%>
             <asp:Label ID="lblOrderPrice" runat="server" Visible="false" />
             <asp:Label ID="lblOrderNo" runat="server" CssClass="col-sm-3" />
             <asp:Label Text="Name :" runat="server" />
