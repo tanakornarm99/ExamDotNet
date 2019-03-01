@@ -522,7 +522,7 @@ namespace BasicCSharp
             string strName = row.Cells[4].Text;
             string[] strSpName = strName.Split(' ');
             txtFirstName.Text = strSpName[0];
-            txtSureName.Text = strSpName[1];
+            //txtSureName.Text = strSpName[1];
 
             ShowTotalPrice(orderId);
 
