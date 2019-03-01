@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BasicCSharp.BusinessLogic;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -17,11 +18,19 @@ namespace BasicCSharp
         private string conString = ConfigurationManager.ConnectionStrings["ConnectionString"].ToString();
         public static string CONTSTANT_OrderID = string.Empty;
         public static string CONTSTANT_CatID = string.Empty;
+
+        private StockLogic _stockLogic;
+        private OrderLogic _orderLogic;
+
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
-                DataTable dtCategory = GetAllCategory();
+                _stockLogic = new StockLogic(conString);
+                _orderLogic = new OrderLogic(conString);
+
+                DataTable dtCategory = _stockLogic.GetAllCategory();
                 ddlCategory.DataSource = dtCategory;
                 ddlCategory.DataValueField = "Id";
                 ddlCategory.DataTextField = "Name";
@@ -29,16 +38,17 @@ namespace BasicCSharp
                 gvCategory.DataSource = dtCategory;
                 gvCategory.DataBind();
 
-                DataTable dtItem = GetAllItem();
+                DataTable dtItem = _stockLogic.GetAllItem();
                 gvItem.DataSource = dtItem;
                 gvItem.DataBind();
 
-                UpdateOrderSumPriceAll();
-                DataTable dtOrder = GetAllOrder();
+                _orderLogic.UpdateOrderSumPriceAll();
+
+                DataTable dtOrder = _orderLogic.GetAllOrder();
                 gvOrder.DataSource = dtOrder;
                 gvOrder.DataBind();
 
-                lblOrderNo.Text = GetOrderNumber(); //make orderNo.
+                lblOrderNo.Text = _orderLogic.GetOrderNumber(); //make orderNo.
             }
         }
 
@@ -277,21 +287,6 @@ namespace BasicCSharp
             lblTotalPrice.Text = formattedPrice; //show ฿xxx.xx
         }
 
-        private void UpdateOrderSumPriceAll()
-        {
-            DataTable dt = GetAllOrder();
-            string[] arryOrderId = new string[dt.Rows.Count];
-            for (int i = 0; i < dt.Rows.Count; i++)
-            {
-                arryOrderId[i] = dt.Rows[i]["Id"].ToString();
-                var sumPrice = GetTotalItemPrice(arryOrderId[i]);
-                string cmdText = "UPDATE [Order] SET [SummaryPrice] = @sumPrice WHERE [Id] = @orderId";
-                List<Param> parameters = new List<Param>();
-                parameters.Add(SetParam("orderId", arryOrderId[i]));
-                parameters.Add(SetParam("sumPrice", sumPrice));
-                ExecuteQuery(cmdText, parameters);
-            }
-        }
 
         private void DeleteOrder(string orderId)
         {
@@ -362,25 +357,7 @@ namespace BasicCSharp
             parameters.Add(SetParam("orderItemId", orderItemId));
             ExecuteQuery(cmdText, parameters);
         }
-
-        private DataTable GetAllItem()
-        {
-            string cmdText = "SELECT * FROM [Item],[Category] WHERE Item.CategoryId = Category.Id";
-            return ExecuteQueryWithResult(cmdText, new List<Param>());
-        }
-
-        private DataTable GetAllCategory()
-        {
-            string cmdText = "SELECT * FROM [Category]";
-            return ExecuteQueryWithResult(cmdText, new List<Param>());
-        }
-
-        private DataTable GetAllOrder()
-        {
-            string cmdText = "SELECT * FROM [Order]";
-            return ExecuteQueryWithResult(cmdText, new List<Param>());
-        }
-
+ 
         private DataTable GetAllOrderItem(string orderId)
         {
             string cmdText = "SELECT * FROM [OrderItem] WHERE OrderId = @orderId";
@@ -389,23 +366,7 @@ namespace BasicCSharp
             return ExecuteQueryWithResult(cmdText, parameters);
         }
 
-        private string GetOrderNumber()
-        {
-            int length = 4;
-            DateTime thisDay = DateTime.Today;
-            string orderNo = "ORD2019000000";
-            DataTable dtOrder = GetAllOrder();
-            if (dtOrder.Rows.Count > 0)
-            {
-                string cmdText = "SELECT TOP 1 OrderNumber FROM [Order] ORDER BY ID DESC";
-                orderNo = ExecuteQueryScalar(cmdText, new List<Param>()).ToString();
-            }
-            int subOrderNo = Convert.ToInt32(orderNo.Substring(orderNo.Length - 4)) + 1;
-            var result = subOrderNo.ToString().PadLeft(length, '0');
-            string resultOrderNumber = thisDay.ToString("ORD" + "yyyyMM" + result);
-            return resultOrderNumber;
-        }
-
+      
         private string GetCategoryName(string catId)
         {
             string cmdText = "SELECT Name FROM [Category] WHERE Id = @catId";
@@ -430,20 +391,7 @@ namespace BasicCSharp
             return ExecuteQueryScalar(cmdText, parameters).ToString();
         }
 
-        private double GetTotalItemPrice(string orderId)
-        {
-            string totalPrice = string.Empty;
-            double sumPrice = 0;
-            string cmdText = "SELECT sum(Price) FROM [OrderItem] WHERE OrderId = @orderId";
-            List<Param> parameters = new List<Param>();
-            parameters.Add(SetParam("orderId", orderId));
-            totalPrice = ExecuteQueryScalar(cmdText, parameters).ToString();
-            if (!string.IsNullOrEmpty(totalPrice))
-            {
-                sumPrice = Convert.ToDouble(totalPrice);
-            }
-            return sumPrice;
-        }
+
 
         private bool CategoryIsNotExist(string categoryName)
         {
@@ -617,80 +565,8 @@ namespace BasicCSharp
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
         }
 
-        private void ExecuteQuery(string commandText, List<Param> parameters)
-        {
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand
-                {
-                    Connection = connection,
-                    CommandText = commandText,
-                    CommandType = CommandType.Text
-                };
-                foreach (var item in parameters)
-                {
-                    cmd.Parameters.AddWithValue("@" + item.Key, item.value);
-                }
-                cmd.ExecuteNonQuery();
-            }
-        }   //Insert Update Delete 
-
-        private object ExecuteQueryScalar(string commandText, List<Param> parameters)
-        {
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand
-                {
-                    Connection = connection,
-                    CommandText = commandText,
-                    CommandType = CommandType.Text
-                };
-                foreach (var item in parameters)
-                {
-                    cmd.Parameters.AddWithValue("@" + item.Key, item.value);
-                }
-                return cmd.ExecuteScalar();
-            }
-        }   //get ExecuteScalar
-
-        private DataTable ExecuteQueryWithResult(string commandText, List<Param> parameters)
-        {
-            using (SqlConnection connection = new SqlConnection(conString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand
-                {
-                    Connection = connection,
-                    CommandText = commandText,
-                    CommandType = CommandType.Text
-                };
-                foreach (var item in parameters)
-                {
-                    cmd.Parameters.AddWithValue("@" + item.Key, item.value);
-                }
-                DataTable dt = new DataTable();
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(dt);
-                return dt;
-            }
-        }   //get datatable
-
-        private Param SetParam(string key, Object value)
-        {
-            return new Param
-            {
-                Key = key,
-                value = value
-            };
-        } //Set Parameter
-
+       
     } //End class WebFormExample
 
-    public class Param
-    {
-        public string Key { get; set; }
-        public object value { get; set; }
-    }  //Object Param SET KEY,VALUE
+  
 }//End
