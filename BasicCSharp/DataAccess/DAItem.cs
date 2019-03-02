@@ -67,6 +67,13 @@ namespace BasicCSharp.DataAccess
             _exec.ExecuteNonQuery(cmdText, parameters);
         }
 
+        public void DeleteItem(string itemId)
+        {
+            string cmdText = "DELETE FROM [Item] WHERE Id = @itemId";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(_exec.SetParam("itemId", itemId));
+            _exec.ExecuteNonQuery(cmdText, parameters);
+        }
 
 
 
@@ -74,7 +81,6 @@ namespace BasicCSharp.DataAccess
 
 
 
-       
 
 
 

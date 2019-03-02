@@ -65,9 +65,7 @@ namespace BasicCSharp.BusinessLogic
                 string categoryOldName = dACategory.GetCategoryName(CONTSTANT_CatID); //Set CONTSTANT_CatID from Method GvItem_Selected 
                 orderLogic.UpdatePriceOrderItem(itemName, itemPrice);
                 dAOrderItem.UpdateItemNameOrderItem(itemOldName, itemName);
-                UpdateCategoryOrderItem(categoryOldName, categoryNewName);
-
-
+                dAOrderItem.UpdateCategoryOrderItem(categoryOldName, categoryNewName);
                 dAItem.UpdateItem(itemId, itemName, itemPrice, categoryId);
 
             }
