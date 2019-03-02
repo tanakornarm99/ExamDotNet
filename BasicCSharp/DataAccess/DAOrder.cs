@@ -63,6 +63,14 @@ namespace BasicCSharp.DataAccess
 
         }
 
+        public void DeleteOrder(string orderId)
+        {
+            string cmdText = "DELETE FROM [Order] WHERE [Id] = @orderID";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(_exec.SetParam("orderId", orderId));
+            _exec.ExecuteNonQuery(cmdText, parameters);
+        }
+
 
 
     }

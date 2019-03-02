@@ -16,21 +16,31 @@ namespace BasicCSharp.DataAccess
             _exec = new ExecuteQuery(connectionString);
         }
 
-        public DataTable GetItemNameOrderItem(string itemName)
+        public DataTable GetOrderItemByIdAndName(string orderId, string itemName)
+        {
+            string cmdText = "SELECT * FROM [OrderItem] WHERE OrderId = @orderId AND ItemName = @itemName";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(_exec.SetParam("orderId", orderId));
+            parameters.Add(_exec.SetParam("itemName", itemName));
+            return _exec.ExecuteQueryWithResult(cmdText, parameters);
+        }
+
+
+        public DataTable GetOrderItemByName(string itemName)
         {
             string paraPrice = string.Empty;
             string cmdText = "SELECT * FROM [OrderItem] WHERE ItemName = @itemName";
             List<Param> parameters = new List<Param>();
             parameters.Add(_exec.SetParam("itemName", itemName));
             return _exec.ExecuteQueryWithResult(cmdText, parameters);
-        } 
-        
+        }
+
         public string GetSumPrice(string orderId)
         {
             string cmdText = "SELECT sum(Price) FROM [OrderItem] WHERE OrderId = @orderId";
             List<Param> parameters = new List<Param>();
             parameters.Add(_exec.SetParam("orderId", orderId));
-            return _exec.ExecuteQueryScalar(cmdText, parameters).ToString();   
+            return _exec.ExecuteQueryScalar(cmdText, parameters).ToString();
         }
 
         public void UpdateCategoryOrderItem(string cateOldName, string cateNewName)
@@ -76,6 +86,56 @@ namespace BasicCSharp.DataAccess
             parameters.Add(_exec.SetParam("itemName", itemName));
             _exec.ExecuteNonQuery(cmdText, parameters);
         }
+
+        public void AddNewOrderItem(string orderId, string itemName, string itemPrice, string category)
+        {
+            int qty = 1;
+            string cmdText = "INSERT INTO [OrderItem] (OrderId,ItemName,Category,Qty,Price) VALUES (@orderId,@itemName,@category,@qty,@price)";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(_exec.SetParam("orderId", orderId));
+            parameters.Add(_exec.SetParam("itemName", itemName));
+            parameters.Add(_exec.SetParam("category", category));
+            parameters.Add(_exec.SetParam("qty", qty));
+            parameters.Add(_exec.SetParam("price", itemPrice));
+            _exec.ExecuteNonQuery(cmdText, parameters);
+        }
+
+        public void UpdateOrderItem(string orderId, double sumQty, double sumPrice, string itemName)
+        {
+            string cmdText = "UPDATE [OrderItem] SET Qty = @sumQty, Price = @sumPrice WHERE OrderId = @orderId AND ItemName = @itemName";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(_exec.SetParam("sumQty", sumQty));
+            parameters.Add(_exec.SetParam("sumPrice", sumPrice));
+            parameters.Add(_exec.SetParam("orderId", orderId));
+            parameters.Add(_exec.SetParam("itemName", itemName));
+            _exec.ExecuteNonQuery(cmdText, parameters);
+        }
+
+        public void DeleteOrderItemID(string orderId)
+        {
+            string cmdText = "DELETE FROM [OrderItem] WHERE [OrderId] = @orderId";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(_exec.SetParam("orderId", orderId));
+            _exec.ExecuteNonQuery(cmdText, parameters);
+        }
+
+        public void DeleteOrderItemName(string orderItemId)
+        {
+            string cmdText = "DELETE FROM [OrderItem] WHERE [Id] = @orderItemId";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(_exec.SetParam("orderItemId", orderItemId));
+            _exec.ExecuteNonQuery(cmdText, parameters);
+        }
+
+        public DataTable GetAllOrderItem(string orderId)
+        {
+            string cmdText = "SELECT * FROM [OrderItem] WHERE OrderId = @orderId";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(_exec.SetParam("orderId", orderId));
+            return _exec.ExecuteQueryWithResult(cmdText, parameters);
+        }
+
+
 
 
 

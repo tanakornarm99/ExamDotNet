@@ -83,7 +83,7 @@ namespace BasicCSharp.BusinessLogic
         {
             //GetAllQtyOrderItem
             DAOrderItem dAOrderItem = new DAOrderItem(_conString);
-            DataTable dt = dAOrderItem.GetItemNameOrderItem(itemName);
+            DataTable dt = dAOrderItem.GetOrderItemByName(itemName);
             double newPrice = Convert.ToDouble(itemPrice);
             string[] arryId = new string[dt.Rows.Count];
             double[] arryQty = new double[dt.Rows.Count];
@@ -118,6 +118,26 @@ namespace BasicCSharp.BusinessLogic
                 dAOrder.UpdateOrder(name, orderId);
             }
         }
+
+        private void AddOrderItemExist(string orderId, string itemName, string itemPrice, string category)
+        {
+            DAOrderItem dAOrderItem = new DAOrderItem(_conString);
+            int itemQty = 0, sumQty = 0;
+            double sumPrice, priceItem = Convert.ToDouble(itemPrice);
+            DataTable dt = dAOrderItem.GetOrderItemByIdAndName(orderId, itemName);
+            if (dt.Rows.Count > 0)
+            {
+                itemQty = Convert.ToInt32(dt.Rows[0]["Qty"]);
+                sumQty = itemQty + 1;
+                sumPrice = priceItem * sumQty;
+                dAOrderItem.UpdateOrderItem(orderId, sumQty, sumPrice, itemName);
+            }
+            else
+            {
+                dAOrderItem.AddNewOrderItem(orderId, itemName, itemPrice, category);
+            }
+        }
+
 
 
     }//end class

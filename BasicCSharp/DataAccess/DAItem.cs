@@ -75,7 +75,13 @@ namespace BasicCSharp.DataAccess
             _exec.ExecuteNonQuery(cmdText, parameters);
         }
 
-
+        public string GetItemPrice(string itemName)
+        {
+            string cmdText = "SELECT [Price] FROM [Item] WHERE Name = @itemName";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(_exec.SetParam("itemName", itemName));
+            return _exec.ExecuteQueryScalar(cmdText, parameters).ToString();
+        }
 
 
 
