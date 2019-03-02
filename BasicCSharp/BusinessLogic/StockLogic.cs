@@ -56,11 +56,12 @@ namespace BasicCSharp.BusinessLogic
         public void UpdateItem(string CONTSTANT_CatID ,string itemId, string itemName, string itemPrice, string categoryId)
         {
             DAItem dAItem = new DAItem(_conString);
+            DACategory dACategory = new DACategory(_conString);
             if (!string.IsNullOrEmpty(itemName) && categoryId != null)
             {
                 string itemOldName = dAItem.GetItemName(itemId);
-                string categoryNewName = GetCategoryName(categoryId);
-                string categoryOldName = GetCategoryName(CONTSTANT_CatID); //Set CONTSTANT_CatID from Method GvItem_Selected 
+                string categoryNewName = dACategory.GetCategoryName(categoryId);
+                string categoryOldName = dACategory.GetCategoryName(CONTSTANT_CatID); //Set CONTSTANT_CatID from Method GvItem_Selected 
                 UpdatePriceOrderItem(itemName, itemPrice);
                 UpdateItemNameOrderItem(itemOldName, itemName);
                 UpdateCategoryOrderItem(categoryOldName, categoryNewName);

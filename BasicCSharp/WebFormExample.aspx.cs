@@ -285,13 +285,7 @@ namespace BasicCSharp
             return ExecuteQueryWithResult(cmdText, parameters);
         }
 
-        private string GetItemName(string itemId)
-        {
-            string cmdText = "SELECT Name FROM [Item] WHERE Id = @itemId";
-            List<Param> parameters = new List<Param>();
-            parameters.Add(SetParam("itemId", itemId));
-            return ExecuteQueryScalar(cmdText, parameters).ToString();
-        }
+       
 
         private string GetItemPrice(string itemName)
         {
