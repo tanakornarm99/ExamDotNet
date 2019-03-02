@@ -14,7 +14,14 @@ namespace BasicCSharp.DataAccess
         public DACategory(string connectionString)
         {
             _exec = new ExecuteQuery(connectionString);
-            
+        }
+
+        public DataTable CategoryIsNotExist(string categoryName)
+        {
+            string cmdText = "SELECT Name FROM [Category] WHERE Name = @categoryName";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(_exec.SetParam("categoryName", categoryName));
+            return _exec.ExecuteQueryWithResult(cmdText, parameters);
         }
 
         public DataTable GetAllCategory()
@@ -56,18 +63,10 @@ namespace BasicCSharp.DataAccess
             _exec.ExecuteNonQuery(cmdText, parameters);
         }
 
-        public bool CategoryIsNotExist(string categoryName)
-        {
-            string cmdText = "SELECT Name FROM [Category] WHERE Name = @categoryName";
-            List<Param> parameters = new List<Param>();
-            parameters.Add(_exec.SetParam("categoryName", categoryName));
-            DataTable dt = _exec.ExecuteQueryWithResult(cmdText, parameters);
-            if (dt.Rows.Count > 0)
-            {
-                return false;
-            }
-            return true;
-        }
+
+
+
+       
 
 
 

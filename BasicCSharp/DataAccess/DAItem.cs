@@ -14,7 +14,14 @@ namespace BasicCSharp.DataAccess
         public DAItem(string connectionString)
         {
             _exec = new ExecuteQuery(connectionString);
-                
+        }
+
+        public DataTable ItemIsNotExist(string itemName)
+        {
+            string cmdText = "SELECT Name FROM [Item] WHERE Name = @itemName";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(_exec.SetParam("itemName", itemName));
+            return _exec.ExecuteQueryWithResult(cmdText, parameters);
         }
 
         public DataTable GetAllItem()
@@ -41,7 +48,6 @@ namespace BasicCSharp.DataAccess
             _exec.ExecuteNonQuery(cmdText, parameters);
         }
 
-
         public void UpdateItem(string itemId, string itemName, string itemPrice, string categoryId)
         {
             string cmdText = "UPDATE [Item] SET Name = @name, Price = @price, CategoryId = @catId WHERE Id = @itemId";
@@ -61,18 +67,14 @@ namespace BasicCSharp.DataAccess
             _exec.ExecuteNonQuery(cmdText, parameters);
         }
 
-        public bool ItemIsNotExist(string itemName)
-        {
-            string cmdText = "SELECT Name FROM [Item] WHERE Name = @itemName";
-            List<Param> parameters = new List<Param>();
-            parameters.Add(_exec.SetParam("itemName", itemName));
-            DataTable dt = _exec.ExecuteQueryWithResult(cmdText, parameters);
-            if (dt.Rows.Count > 0)
-            {
-                return false;
-            }
-            return true;
-        }
+
+
+
+
+
+
+
+       
 
 
 

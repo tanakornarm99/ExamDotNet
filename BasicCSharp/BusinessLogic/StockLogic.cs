@@ -33,7 +33,7 @@ namespace BasicCSharp.BusinessLogic
             DACategory dACategory = new DACategory(_conString);
             if (!string.IsNullOrEmpty(categoryName))
             {
-                if (dACategory.CategoryIsNotExist(categoryName.Trim()))
+                if (CategoryIsNotExist(categoryName.Trim()))
                 {
                     dACategory.AddCategory(categoryName);
                 }
@@ -45,24 +45,24 @@ namespace BasicCSharp.BusinessLogic
             DAItem dAItem = new DAItem(_conString);
             if (!string.IsNullOrEmpty(itemName) && categoryId != 0)
             {
-                if (dAItem.ItemIsNotExist(itemName.Trim()))
+                if (ItemIsNotExist(itemName.Trim()))
                 {
                     dAItem.AddItem(itemName, itemPrice, categoryId);
                 }
             }
         }
 
-
         public void UpdateItem(string CONTSTANT_CatID ,string itemId, string itemName, string itemPrice, string categoryId)
         {
             DAItem dAItem = new DAItem(_conString);
             DACategory dACategory = new DACategory(_conString);
+            OrderLogic orderLogic = new OrderLogic(_conString);
             if (!string.IsNullOrEmpty(itemName) && categoryId != null)
             {
                 string itemOldName = dAItem.GetItemName(itemId);
                 string categoryNewName = dACategory.GetCategoryName(categoryId);
                 string categoryOldName = dACategory.GetCategoryName(CONTSTANT_CatID); //Set CONTSTANT_CatID from Method GvItem_Selected 
-                UpdatePriceOrderItem(itemName, itemPrice);
+                orderLogic.UpdatePriceOrderItem(itemName, itemPrice);
                 UpdateItemNameOrderItem(itemOldName, itemName);
                 UpdateCategoryOrderItem(categoryOldName, categoryNewName);
 
@@ -78,7 +78,7 @@ namespace BasicCSharp.BusinessLogic
             DAOrderItem dAOrderItem = new DAOrderItem(_conString);
             if (!string.IsNullOrEmpty(categoryName))
             {
-                if (dACategory.CategoryIsNotExist(categoryName.Trim()))
+                if (CategoryIsNotExist(categoryName.Trim()))
                 {
                     string categoryOldName = dACategory.GetCategoryName(categoryId);
                     dAOrderItem.UpdateCategoryOrderItem(categoryOldName, categoryName);
@@ -87,6 +87,27 @@ namespace BasicCSharp.BusinessLogic
             }
         }
 
+        private bool CategoryIsNotExist(string categoryName)
+        {
+            DACategory dACategory = new DACategory(_conString);
+            DataTable dt = dACategory.CategoryIsNotExist(categoryName);
+            if (dt.Rows.Count > 0)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private bool ItemIsNotExist(string itemName)
+        {
+            DAItem dAItem = new DAItem(_conString);
+            DataTable dt = dAItem.ItemIsNotExist(itemName);
+            if (dt.Rows.Count > 0)
+            {
+                return false;
+            }
+            return true;
+        }
 
 
     }

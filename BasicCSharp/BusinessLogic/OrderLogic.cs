@@ -20,7 +20,6 @@ namespace BasicCSharp.BusinessLogic
         {
             DAOrder dAOrder = new DAOrder(_conString);
             return dAOrder.GetAllOrder();
-
         }
 
         public string GetOrderNumber()
@@ -44,7 +43,6 @@ namespace BasicCSharp.BusinessLogic
         {
             DAOrder dAOrder = new DAOrder(_conString);
             DataTable dt = dAOrder.GetAllOrder();
-
             string[] arryOrderId = new string[dt.Rows.Count];
             for (int i = 0; i < dt.Rows.Count; i++)
             {
@@ -67,7 +65,23 @@ namespace BasicCSharp.BusinessLogic
             return sumPrice;
         }
 
-
+        public void UpdatePriceOrderItem(string itemName, string itemPrice)
+        {
+            //GetAllQtyOrderItem
+            DAOrderItem dAOrderItem = new DAOrderItem(_conString);
+            DataTable dt = dAOrderItem.GetItemNameOrderItem(itemName);
+            double newPrice = Convert.ToDouble(itemPrice);
+            string[] arryId = new string[dt.Rows.Count];
+            double[] arryQty = new double[dt.Rows.Count];
+            double[] arrySumPrice = new double[dt.Rows.Count];
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                arryId[i] = dt.Rows[i]["Id"].ToString();
+                arryQty[i] = Convert.ToInt32(dt.Rows[i]["Qty"]);
+                arrySumPrice[i] = arryQty[i] * newPrice;
+                dAOrderItem.UpdatePriceOrderItem(arrySumPrice[i], itemName, arryId[i]);
+            }
+        }
 
 
     }//end class

@@ -94,31 +94,7 @@ namespace BasicCSharp
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
         }
 
-        private void UpdatePriceOrderItem(string itemName, string itemPrice)
-        {
-            //GetAllQtyOrderItem
-            string paraPrice = string.Empty;
-            string cmdText = "SELECT * FROM [OrderItem] WHERE ItemName = @itemName";
-            List<Param> parameters = new List<Param>();
-            parameters.Add(SetParam("itemName", itemName));
-            DataTable dt = ExecuteQueryWithResult(cmdText, parameters);
-            double newPrice = Convert.ToDouble(itemPrice);
-            string[] arryId = new string[dt.Rows.Count];
-            double[] arryQty = new double[dt.Rows.Count];
-            double[] arrySumPrice = new double[dt.Rows.Count];
-            for (int i = 0; i < dt.Rows.Count; i++)
-            {
-                arryId[i] = dt.Rows[i]["Id"].ToString();
-                arryQty[i] = Convert.ToInt32(dt.Rows[i]["Qty"]);
-                arrySumPrice[i] = arryQty[i] * newPrice;
-                string cmd = "UPDATE [OrderItem] SET Price = @newPrice WHERE ItemName = @itemName AND Id = @arryId";
-                List<Param> paramety = new List<Param>();
-                paramety.Add(SetParam("newPrice", arrySumPrice[i]));
-                paramety.Add(SetParam("itemName", itemName));
-                paramety.Add(SetParam("arryId", arryId[i]));
-                ExecuteQuery(cmd, paramety);
-            }
-        }
+       
 
         private void UpdateItemNameOrderItem(string itemOldName, string itemNewName)
         {

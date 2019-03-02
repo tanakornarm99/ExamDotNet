@@ -1,6 +1,7 @@
 ﻿using BasicCSharp.Model;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web;
 
@@ -15,6 +16,15 @@ namespace BasicCSharp.DataAccess
             _exec = new ExecuteQuery(connectionString);
         }
 
+        public DataTable GetItemNameOrderItem(string itemName)
+        {
+            string paraPrice = string.Empty;
+            string cmdText = "SELECT * FROM [OrderItem] WHERE ItemName = @itemName";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(_exec.SetParam("itemName", itemName));
+            return _exec.ExecuteQueryWithResult(cmdText, parameters);
+        } 
+        
         public string GetSumPrice(string orderId)
         {
             string cmdText = "SELECT sum(Price) FROM [OrderItem] WHERE OrderId = @orderId";
@@ -32,6 +42,15 @@ namespace BasicCSharp.DataAccess
             _exec.ExecuteNonQuery(cmdText, parameters);
         }
 
+        public void UpdatePriceOrderItem(double newPrice, string itemName, string orderItemId)
+        {
+            string cmd = "UPDATE [OrderItem] SET Price = @newPrice WHERE ItemName = @itemName AND Id = @orderItemId";
+            List<Param> paramety = new List<Param>();
+            paramety.Add(_exec.SetParam("newPrice", newPrice));
+            paramety.Add(_exec.SetParam("itemName", itemName));
+            paramety.Add(_exec.SetParam("orderItemId", orderItemId));
+            _exec.ExecuteNonQuery(cmd, paramety);
+        }
 
         public void DeleteCategoryOrderItem(string categoryName)
         {
@@ -40,6 +59,8 @@ namespace BasicCSharp.DataAccess
             parameters.Add(_exec.SetParam("categoryName", categoryName));
             _exec.ExecuteNonQuery(cmdText, parameters);
         }
+
+
 
 
     }
