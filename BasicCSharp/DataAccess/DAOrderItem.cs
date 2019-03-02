@@ -60,7 +60,6 @@ namespace BasicCSharp.DataAccess
             _exec.ExecuteNonQuery(cmdText, parameters);
         }
 
-
         public void UpdateItemNameOrderItem(string itemOldName, string itemNewName)
         {
             string cmdText = "UPDATE [OrderItem] SET ItemName = @itemNewName WHERE ItemName = @itemOldName";
@@ -70,6 +69,14 @@ namespace BasicCSharp.DataAccess
             _exec.ExecuteNonQuery(cmdText, parameters);
         }
 
+
+        public void DeleteItemOrderItem(string itemName)
+        {
+            string cmdText = "DELETE FROM [OrderItem] WHERE ItemName = @itemName";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(_exec.SetParam("itemName", itemName));
+            _exec.ExecuteNonQuery(cmdText, parameters);
+        }
 
 
     }
