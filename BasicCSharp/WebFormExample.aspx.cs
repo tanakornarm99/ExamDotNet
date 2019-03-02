@@ -285,9 +285,6 @@ namespace BasicCSharp
             return ExecuteQueryWithResult(cmdText, parameters);
         }
 
-      
-     
-
         private string GetItemName(string itemId)
         {
             string cmdText = "SELECT Name FROM [Item] WHERE Id = @itemId";
@@ -303,8 +300,6 @@ namespace BasicCSharp
             parameters.Add(SetParam("itemName", itemName));
             return ExecuteQueryScalar(cmdText, parameters).ToString();
         }
-
-       
 
         //EventButton Selete Value
         protected void GvCategory_Selected(object sender, EventArgs e)

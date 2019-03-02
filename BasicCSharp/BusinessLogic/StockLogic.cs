@@ -58,7 +58,7 @@ namespace BasicCSharp.BusinessLogic
             DAItem dAItem = new DAItem(_conString);
             if (!string.IsNullOrEmpty(itemName) && categoryId != null)
             {
-                string itemOldName = GetItemName(itemId);
+                string itemOldName = dAItem.GetItemName(itemId);
                 string categoryNewName = GetCategoryName(categoryId);
                 string categoryOldName = GetCategoryName(CONTSTANT_CatID); //Set CONTSTANT_CatID from Method GvItem_Selected 
                 UpdatePriceOrderItem(itemName, itemPrice);

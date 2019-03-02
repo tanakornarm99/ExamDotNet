@@ -23,6 +23,14 @@ namespace BasicCSharp.DataAccess
             return _exec.ExecuteQueryWithResult(cmdText, new List<Param>());
         }
 
+        public string GetItemName(string itemId)
+        {
+            string cmdText = "SELECT Name FROM [Item] WHERE Id = @itemId";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(_exec.SetParam("itemId", itemId));
+            return _exec.ExecuteQueryScalar(cmdText, parameters).ToString();
+        }
+
         public void AddItem(string itemName, string itemPrice, int categoryId)
         {
             string cmdText = "INSERT INTO [Item] (Name,Price,CategoryId) VALUES (@name,@price,@categoryId)";
