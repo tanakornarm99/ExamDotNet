@@ -37,6 +37,19 @@ namespace BasicCSharp.DataAccess
             _exec.ExecuteNonQuery(cmdText, parameters);
         }
 
+        public void AddOrder(string orderNumber, string firstName, string sureName)
+        {
+            double sumPrice = 0;
+            string date = DateTime.Now.ToString();
+            string nameFrom = firstName + " " + sureName;
+            string cmdText = "INSERT INTO [Order] (OrderNumber,[From],SummaryPrice,Date) VALUES (@orderNumber,@from,@sumPrice,@date)";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(_exec.SetParam("orderNumber", orderNumber));
+            parameters.Add(_exec.SetParam("from", nameFrom));
+            parameters.Add(_exec.SetParam("sumPrice", sumPrice));
+            parameters.Add(_exec.SetParam("date", date));
+            _exec.ExecuteNonQuery(cmdText, parameters);
+        }
 
 
 

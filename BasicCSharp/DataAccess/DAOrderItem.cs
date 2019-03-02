@@ -69,7 +69,6 @@ namespace BasicCSharp.DataAccess
             _exec.ExecuteNonQuery(cmdText, parameters);
         }
 
-
         public void DeleteItemOrderItem(string itemName)
         {
             string cmdText = "DELETE FROM [OrderItem] WHERE ItemName = @itemName";

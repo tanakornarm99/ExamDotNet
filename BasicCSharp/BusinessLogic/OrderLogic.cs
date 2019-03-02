@@ -84,5 +84,19 @@ namespace BasicCSharp.BusinessLogic
         }
 
 
+        public void AddOrder(string orderNumber, string firstName, string sureName, string contact, string email)
+        {
+            DAOrder dAOrder = new DAOrder(_conString);
+            DACustomer dACustomer = new DACustomer(_conString);
+            if (!string.IsNullOrEmpty(firstName) && !string.IsNullOrEmpty(sureName))
+            {
+                dAOrder.AddOrder(orderNumber, firstName, sureName);
+                //string oderId = GetOrderId(orderNumber);
+                //paramety.Add(SetParam("orderId", orderId));
+                dACustomer.AddCustomer(firstName, sureName, contact, email);
+            }
+        }
+
+
     }//end class
 }//End

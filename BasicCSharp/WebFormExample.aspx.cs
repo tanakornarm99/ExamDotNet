@@ -94,57 +94,14 @@ namespace BasicCSharp
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
         }
 
-       
-
-        
-
-        private void DeleteItem(string itemId)
-        {
-            string cmdText = "DELETE FROM [Item] WHERE Id = @itemId";
-            List<Param> parameters = new List<Param>();
-            parameters.Add(SetParam("itemId", itemId));
-            ExecuteQuery(cmdText, parameters);
-        }
-
-        private void DeleteItemOrderItem(string itemName)
-        {
-            string cmdText = "DELETE FROM [OrderItem] WHERE ItemName = @itemName";
-            List<Param> parameters = new List<Param>();
-            parameters.Add(SetParam("itemName", itemName));
-            ExecuteQuery(cmdText, parameters);
-        }
-
         protected void AddOrder(object sender, EventArgs e)
         {
-            double sumPrice = 0;
-            string date = DateTime.Now.ToString();
             string orderNumber = lblOrderNo.Text;
             string firstName = txtFirstName.Text.Trim();
             string sureName = txtSureName.Text.Trim();
             string contact = txtContact.Text.Trim();
             string email = txtEmail.Text.Trim();
-            string nameFrom = firstName + " " + sureName;
-            if (!string.IsNullOrEmpty(firstName) && !string.IsNullOrEmpty(sureName))
-            {
-                string cmdText = "INSERT INTO [Order] (OrderNumber,[From],SummaryPrice,Date) VALUES (@orderNumber,@from,@sumPrice,@date)";
-                List<Param> parameters = new List<Param>();
-                parameters.Add(SetParam("orderNumber", orderNumber));
-                parameters.Add(SetParam("from", nameFrom));
-                parameters.Add(SetParam("sumPrice", sumPrice));
-                parameters.Add(SetParam("date", date));
-                ExecuteQuery(cmdText, parameters);
-
-                //string oderId = GetOrderId(orderNumber);
-                //paramety.Add(SetParam("orderId", orderId));
-
-                string cmd = "INSERT INTO [Customer] (Firstname,Surename,Contact,Email) VALUES (@firstName,@sureName,@contact,@email)";
-                List<Param> paramety = new List<Param>();
-                paramety.Add(SetParam("firstName", firstName));
-                paramety.Add(SetParam("sureName", sureName));
-                paramety.Add(SetParam("contact", contact));
-                paramety.Add(SetParam("email", email));
-                ExecuteQuery(cmd, paramety);
-            }
+            _orderLogic.AddOrder(orderNumber, firstName, sureName, contact, email);
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
         }
 
