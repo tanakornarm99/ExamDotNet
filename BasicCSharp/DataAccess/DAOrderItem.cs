@@ -61,6 +61,15 @@ namespace BasicCSharp.DataAccess
         }
 
 
+        public void UpdateItemNameOrderItem(string itemOldName, string itemNewName)
+        {
+            string cmdText = "UPDATE [OrderItem] SET ItemName = @itemNewName WHERE ItemName = @itemOldName";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(_exec.SetParam("itemNewName", itemNewName));
+            parameters.Add(_exec.SetParam("itemOldName", itemOldName));
+            _exec.ExecuteNonQuery(cmdText, parameters);
+        }
+
 
 
     }

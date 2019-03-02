@@ -57,13 +57,14 @@ namespace BasicCSharp.BusinessLogic
             DAItem dAItem = new DAItem(_conString);
             DACategory dACategory = new DACategory(_conString);
             OrderLogic orderLogic = new OrderLogic(_conString);
+            DAOrderItem dAOrderItem = new DAOrderItem(_conString);
             if (!string.IsNullOrEmpty(itemName) && categoryId != null)
             {
                 string itemOldName = dAItem.GetItemName(itemId);
                 string categoryNewName = dACategory.GetCategoryName(categoryId);
                 string categoryOldName = dACategory.GetCategoryName(CONTSTANT_CatID); //Set CONTSTANT_CatID from Method GvItem_Selected 
                 orderLogic.UpdatePriceOrderItem(itemName, itemPrice);
-                UpdateItemNameOrderItem(itemOldName, itemName);
+                dAOrderItem.UpdateItemNameOrderItem(itemOldName, itemName);
                 UpdateCategoryOrderItem(categoryOldName, categoryNewName);
 
 

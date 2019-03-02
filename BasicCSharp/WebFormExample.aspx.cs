@@ -96,14 +96,7 @@ namespace BasicCSharp
 
        
 
-        private void UpdateItemNameOrderItem(string itemOldName, string itemNewName)
-        {
-            string cmdText = "UPDATE [OrderItem] SET ItemName = @itemNewName WHERE ItemName = @itemOldName";
-            List<Param> parameters = new List<Param>();
-            parameters.Add(SetParam("itemNewName", itemNewName));
-            parameters.Add(SetParam("itemOldName", itemOldName));
-            ExecuteQuery(cmdText, parameters);
-        }
+        
 
         private void DeleteItem(string itemId)
         {
