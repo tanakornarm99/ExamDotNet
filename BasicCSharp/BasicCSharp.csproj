@@ -115,6 +115,13 @@
     <Content Include="WebFormExample.aspx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BusinessLogic\OrderLogic.cs" />
+    <Compile Include="BusinessLogic\StockLogic.cs" />
+    <Compile Include="DataAccess\DACategory.cs" />
+    <Compile Include="DataAccess\DAItem.cs" />
+    <Compile Include="DataAccess\DAOrder.cs" />
+    <Compile Include="DataAccess\DAOrderItem.cs" />
+    <Compile Include="DataAccess\ExecuteQuery.cs" />
     <Compile Include="Example.aspx.cs">
       <DependentUpon>Example.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -122,6 +129,7 @@
     <Compile Include="Example.aspx.designer.cs">
       <DependentUpon>Example.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Model\Param.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebFormExample.aspx.cs">
       <DependentUpon>WebFormExample.aspx</DependentUpon>
@@ -157,6 +165,7 @@
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

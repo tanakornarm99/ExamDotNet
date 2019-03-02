@@ -40,7 +40,6 @@ namespace BasicCSharp.BusinessLogic
             return resultOrderNumber;
         }
 
-
         public void UpdateOrderSumPriceAll()
         {
             DAOrder dAOrder = new DAOrder(_conString);
@@ -67,6 +66,9 @@ namespace BasicCSharp.BusinessLogic
             }
             return sumPrice;
         }
+
+
+
 
     }//end class
 }//End

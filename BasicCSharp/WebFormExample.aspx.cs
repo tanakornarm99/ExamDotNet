@@ -16,8 +16,8 @@ namespace BasicCSharp
     public partial class WebFormExample : System.Web.UI.Page
     {
         private string conString = ConfigurationManager.ConnectionStrings["ConnectionString"].ToString();
-        public static string CONTSTANT_OrderID = string.Empty;
-        public static string CONTSTANT_CatID = string.Empty;
+        private string CONTSTANT_OrderID = string.Empty;
+        private string CONTSTANT_CatID = string.Empty;
 
         private StockLogic _stockLogic;
         private OrderLogic _orderLogic;
@@ -55,17 +55,7 @@ namespace BasicCSharp
         protected void AddCategory(object sender, EventArgs e)
         {
             string categoryName = txtCategory.Text;
-
-            if (!string.IsNullOrEmpty(categoryName))
-            {
-                if (CategoryIsNotExist(categoryName.Trim()))
-                {
-                    string cmdText = "INSERT INTO [Category] (Name) VALUES (@name)";
-                    List<Param> parameters = new List<Param>();
-                    parameters.Add(SetParam("name", categoryName));
-                    ExecuteQuery(cmdText, parameters);
-                }
-            }
+            _stockLogic.AddCategory(categoryName);
             ClearCategory(sender, e);
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
         }
@@ -73,57 +63,12 @@ namespace BasicCSharp
         protected void UpdateCategory(object sender, EventArgs e)
         {
             string categoryName = txtCategory.Text;
-            if (!string.IsNullOrEmpty(categoryName))
-            {
-                string categoryId = lblCategoryId.Text;
-                if (CategoryIsNotExist(categoryName.Trim()))
-                {
-                    string categoryOldName = GetCategoryName(categoryId);
-                    UpdateCategoryOrderItem(categoryOldName, categoryName);
-                    string cmdText = "UPDATE [Category] SET Name = @name WHERE Id = @catId";
-                    List<Param> parameters = new List<Param>();
-                    parameters.Add(SetParam("name", categoryName));
-                    parameters.Add(SetParam("catId", categoryId));
-                    ExecuteQuery(cmdText, parameters);
-                }
-            }
+            string categoryId = lblCategoryId.Text;
+            _stockLogic.UpdateCategory(categoryName, categoryId);
             ClearCategory(sender, e);
             btnAddCategory.Visible = true;
             btnUpdateCategory.Visible = false;
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
-        }
-
-        private void UpdateCategoryOrderItem(string cateOldName, string cateNewName)
-        {
-            string cmdText = "UPDATE [OrderItem] SET Category = @cateNewName WHERE Category = @cateOldName";
-            List<Param> parameters = new List<Param>();
-            parameters.Add(SetParam("cateNewName", cateNewName));
-            parameters.Add(SetParam("cateOldName", cateOldName));
-            ExecuteQuery(cmdText, parameters);
-        }
-
-        private void DeleteCategory(string catId)
-        {
-            string cmdText = "DELETE FROM [Category] WHERE Id = @categoryId";
-            List<Param> parameters = new List<Param>();
-            parameters.Add(SetParam("categoryId", catId));
-            ExecuteQuery(cmdText, parameters);
-        }
-
-        private void DeleteCategoryItem(string catId)
-        {
-            string cmdText = "DELETE FROM [Item] WHERE CategoryId = @catId";
-            List<Param> parameters = new List<Param>();
-            parameters.Add(SetParam("catId", catId));
-            ExecuteQuery(cmdText, parameters);
-        }
-
-        private void DeleteCategoryOrderItem(string categoryName)
-        {
-            string cmdText = "DELETE FROM [OrderItem] WHERE Category = @categoryName";
-            List<Param> parameters = new List<Param>();
-            parameters.Add(SetParam("categoryName", categoryName));
-            ExecuteQuery(cmdText, parameters);
         }
 
         protected void AddItem(object sender, EventArgs e)
@@ -131,18 +76,7 @@ namespace BasicCSharp
             string itemName = txtItemName.Text;
             string itemPrice = txtItemPrice.Text;
             int categoryId = Convert.ToInt32(ddlCategory.SelectedValue);
-            if (!string.IsNullOrEmpty(itemName) && categoryId != 0)
-            {
-                if (ItemIsNotExist(itemName.Trim()))
-                {
-                    string cmdText = "INSERT INTO [Item] (Name,Price,CategoryId) VALUES (@name,@price,@categoryId)";
-                    List<Param> parameters = new List<Param>();
-                    parameters.Add(SetParam("name", itemName));
-                    parameters.Add(SetParam("price", itemPrice));
-                    parameters.Add(SetParam("categoryId", categoryId));
-                    ExecuteQuery(cmdText, parameters);
-                }
-            }
+            _stockLogic.AddItem(itemName, itemPrice, categoryId);
             ClearItem(sender, e);
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
         }
@@ -153,22 +87,7 @@ namespace BasicCSharp
             string itemName = txtItemName.Text;
             string itemPrice = txtItemPrice.Text;
             string categoryId = ddlCategory.SelectedValue.ToString();
-            if (!string.IsNullOrEmpty(itemName) && categoryId != null)
-            {
-                string itemOldName = GetItemName(itemId);
-                string categoryNewName = GetCategoryName(categoryId);
-                string categoryOldName = GetCategoryName(CONTSTANT_CatID); //Set CONTSTANT_CatID from Method GvItem_Selected 
-                UpdatePriceOrderItem(itemName, itemPrice);
-                UpdateItemNameOrderItem(itemOldName, itemName);
-                UpdateCategoryOrderItem(categoryOldName, categoryNewName);
-                string cmdText = "UPDATE [Item] SET Name = @name, Price = @price, CategoryId = @catId WHERE Id = @itemId";
-                List<Param> parameters = new List<Param>();
-                parameters.Add(SetParam("itemId", itemId));
-                parameters.Add(SetParam("name", itemName));
-                parameters.Add(SetParam("price", itemPrice));
-                parameters.Add(SetParam("catId", categoryId));
-                ExecuteQuery(cmdText, parameters);
-            }
+            _stockLogic.UpdateItem(CONTSTANT_CatID, itemId,itemName, itemPrice, categoryId);
             ClearItem(sender, e);
             btnAddItem.Visible = true;
             btnUpdateItem.Visible = false;
@@ -367,13 +286,7 @@ namespace BasicCSharp
         }
 
       
-        private string GetCategoryName(string catId)
-        {
-            string cmdText = "SELECT Name FROM [Category] WHERE Id = @catId";
-            List<Param> parameters = new List<Param>();
-            parameters.Add(SetParam("catId", catId));
-            return ExecuteQueryScalar(cmdText, parameters).ToString();
-        }
+     
 
         private string GetItemName(string itemId)
         {
@@ -391,33 +304,7 @@ namespace BasicCSharp
             return ExecuteQueryScalar(cmdText, parameters).ToString();
         }
 
-
-
-        private bool CategoryIsNotExist(string categoryName)
-        {
-            string cmdText = "SELECT Name FROM [Category] WHERE Name = @categoryName";
-            List<Param> parameters = new List<Param>();
-            parameters.Add(SetParam("categoryName", categoryName));
-            DataTable dt = ExecuteQueryWithResult(cmdText, parameters);
-            if (dt.Rows.Count > 0)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        private bool ItemIsNotExist(string itemName)
-        {
-            string cmdText = "SELECT Name FROM [Item] WHERE Name = @itemName";
-            List<Param> parameters = new List<Param>();
-            parameters.Add(SetParam("itemName", itemName));
-            DataTable dt = ExecuteQueryWithResult(cmdText, parameters);
-            if (dt.Rows.Count > 0)
-            {
-                return false;
-            }
-            return true;
-        }
+       
 
         //EventButton Selete Value
         protected void GvCategory_Selected(object sender, EventArgs e)
@@ -535,7 +422,7 @@ namespace BasicCSharp
         protected void AddOrderItem_Click(object sender, EventArgs e)
         {
             lblGvAddItem.Visible = true;
-            DataTable dtItem = GetAllItem();
+            DataTable dtItem = _stockLogic.GetAllItem();
             gvAddOrderItem.DataSource = dtItem;
             gvAddOrderItem.DataBind();
         }
