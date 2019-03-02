@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Web;
 
 namespace BasicCSharp.BusinessLogic
@@ -54,15 +56,27 @@ namespace BasicCSharp.BusinessLogic
 
         private double GetTotalItemPrice(string orderId)
         {
+            DAOrderItem daOrderItem = new DAOrderItem(_conString);
             string totalPrice = string.Empty;
             double sumPrice = 0;
-            DAOrderItem daOrderItem = new DAOrderItem(_conString);
             totalPrice = daOrderItem.GetSumPrice(orderId);
             if (!string.IsNullOrEmpty(totalPrice))
             {
                 sumPrice = Convert.ToDouble(totalPrice);
             }
             return sumPrice;
+        }
+
+        public string ShowTotalPrice(string orderId)
+        {
+            DAOrderItem daOrderItem = new DAOrderItem(_conString);
+            var sumPrice = Convert.ToDouble(daOrderItem.GetSumPrice(orderId));
+            var cultureInfo = Thread.CurrentThread.CurrentCulture;
+            var numberFormatInfo = (NumberFormatInfo)cultureInfo.NumberFormat.Clone();
+            numberFormatInfo.CurrencySymbol = "฿"; // Replace with "$" or "£" or whatever you need
+            var formattedPrice = sumPrice.ToString("C", numberFormatInfo);
+            //lblTotalPrice.Text = formattedPrice; //show ฿xxx.xx
+            return formattedPrice;
         }
 
         public void UpdatePriceOrderItem(string itemName, string itemPrice)
@@ -83,7 +97,6 @@ namespace BasicCSharp.BusinessLogic
             }
         }
 
-
         public void AddOrder(string orderNumber, string firstName, string sureName, string contact, string email)
         {
             DAOrder dAOrder = new DAOrder(_conString);
@@ -94,6 +107,15 @@ namespace BasicCSharp.BusinessLogic
                 //string oderId = GetOrderId(orderNumber);
                 //paramety.Add(SetParam("orderId", orderId));
                 dACustomer.AddCustomer(firstName, sureName, contact, email);
+            }
+        }
+
+        public void UpdateOrder(string name, string orderId)
+        {
+            DAOrder dAOrder = new DAOrder(_conString);
+            if (!string.IsNullOrEmpty(name))
+            {
+                dAOrder.UpdateOrder(name, orderId);
             }
         }
 

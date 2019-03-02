@@ -107,31 +107,11 @@ namespace BasicCSharp
 
         protected void UpdateOrder(object sender, EventArgs e)
         {
-            string orderId = CONTSTANT_OrderID;
-            string date = DateTime.Now.ToString();
             string name = txtFirstName.Text;
-            if (!string.IsNullOrEmpty(name))
-            {
-                string cmdText = "UPDATE [Order] SET [From] = @name, Date = @date WHERE Id = @orderId";
-                List<Param> parameters = new List<Param>();
-                parameters.Add(SetParam("name", name));
-                parameters.Add(SetParam("date", date));
-                parameters.Add(SetParam("orderId", orderId));
-                ExecuteQuery(cmdText, parameters);
-            }
+            string orderId = CONTSTANT_OrderID;
+            _orderLogic.UpdateOrder(name, orderId);
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
         }
-
-        private void ShowTotalPrice(string orderId)
-        {
-            var sumPrice = GetTotalItemPrice(orderId);
-            var cultureInfo = Thread.CurrentThread.CurrentCulture;
-            var numberFormatInfo = (NumberFormatInfo)cultureInfo.NumberFormat.Clone();
-            numberFormatInfo.CurrencySymbol = "฿"; // Replace with "$" or "£" or whatever you need
-            var formattedPrice = sumPrice.ToString("C", numberFormatInfo);
-            lblTotalPrice.Text = formattedPrice; //show ฿xxx.xx
-        }
-
 
         private void DeleteOrder(string orderId)
         {
@@ -274,7 +254,7 @@ namespace BasicCSharp
             txtFirstName.Text = strSpName[0];
             //txtSureName.Text = strSpName[1];
 
-            ShowTotalPrice(orderId);
+            lblTotalPrice.Text = _orderLogic.ShowTotalPrice(orderId);
 
             DataTable dtOrderItem = GetAllOrderItem(orderId);
             gvOrderItem.DataSource = dtOrderItem;
@@ -302,7 +282,7 @@ namespace BasicCSharp
             string itemPrice = row.Cells[3].Text;
             string category = row.Cells[6].Text;
             AddOrderItemExist(orderId, itemName, itemPrice, category);
-            ShowTotalPrice(orderId);
+            lblTotalPrice.Text = _orderLogic.ShowTotalPrice(orderId);
 
             DataTable dtOrderItem = GetAllOrderItem(orderId);
             gvOrderItem.DataSource = dtOrderItem;
@@ -328,7 +308,7 @@ namespace BasicCSharp
             {
                 DeleteOrderItemName(orderItemId);
             }
-            ShowTotalPrice(orderId);
+            lblTotalPrice.Text = _orderLogic.ShowTotalPrice(orderId);
             DataTable dtOrderItem = GetAllOrderItem(orderId);
             gvOrderItem.DataSource = dtOrderItem;
             gvOrderItem.DataBind();
