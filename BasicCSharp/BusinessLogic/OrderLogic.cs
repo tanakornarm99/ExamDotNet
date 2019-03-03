@@ -76,7 +76,16 @@ namespace BasicCSharp.BusinessLogic
         public string ShowTotalPrice(string orderId)
         {
             DAOrderItem daOrderItem = new DAOrderItem(_conString);
-            var sumPrice = Convert.ToDouble(daOrderItem.GetSumPrice(orderId));
+            double sumPrice;
+            string price = daOrderItem.GetSumPrice(orderId);
+            if (string.IsNullOrEmpty(price))
+            {
+                sumPrice = 0.00;
+            }
+            else
+            {
+                sumPrice = Convert.ToDouble(price);
+            }
             var cultureInfo = Thread.CurrentThread.CurrentCulture;
             var numberFormatInfo = (NumberFormatInfo)cultureInfo.NumberFormat.Clone();
             numberFormatInfo.CurrencySymbol = "฿"; // Replace with "$" or "£" or whatever you need
@@ -125,11 +134,13 @@ namespace BasicCSharp.BusinessLogic
             }
         }
 
-        public void AddOrderItemExist(string orderId, string itemName, string itemPrice, string category)
+        public void AddOrderItemExist(string orderId, string itemName, string itemPrice, string categoryId)
         {
+            DACategory dACategory = new DACategory(_conString);
+            DAOrderItem dAOrderItem = new DAOrderItem(_conString);
             int itemQty = 0, sumQty = 0;
             double sumPrice, priceItem = Convert.ToDouble(itemPrice);
-            DAOrderItem dAOrderItem = new DAOrderItem(_conString);
+            string categoryName = dACategory.GetCategoryName(categoryId);
             DataTable dt = dAOrderItem.GetOrderItemByIdAndName(orderId, itemName);
             if (dt.Rows.Count > 0)
             {
@@ -140,7 +151,7 @@ namespace BasicCSharp.BusinessLogic
             }
             else
             {
-                dAOrderItem.AddNewOrderItem(orderId, itemName, itemPrice, category);
+                dAOrderItem.AddNewOrderItem(orderId, itemName, itemPrice, categoryName);
             }
         }
 

@@ -16,8 +16,8 @@ namespace BasicCSharp
     public partial class WebFormExample : System.Web.UI.Page
     {
         private string conString = ConfigurationManager.ConnectionStrings["ConnectionString"].ToString();
-        private string CONTSTANT_OrderID = string.Empty;
-        private string CONTSTANT_CatID = string.Empty;
+        private static string CONTSTANT_OrderID;
+        private static string CONTSTANT_CatID; 
 
         private StockLogic _stockLogic;
         private OrderLogic _orderLogic;
@@ -54,6 +54,7 @@ namespace BasicCSharp
 
         protected void AddCategory(object sender, EventArgs e)
         {
+            _stockLogic = new StockLogic(conString);
             string categoryName = txtCategory.Text;
             _stockLogic.AddCategory(categoryName);
             ClearCategory(sender, e);
@@ -62,6 +63,7 @@ namespace BasicCSharp
 
         protected void UpdateCategory(object sender, EventArgs e)
         {
+            _stockLogic = new StockLogic(conString);
             string categoryName = txtCategory.Text;
             string categoryId = lblCategoryId.Text;
             _stockLogic.UpdateCategory(categoryName, categoryId);
@@ -73,6 +75,7 @@ namespace BasicCSharp
 
         protected void AddItem(object sender, EventArgs e)
         {
+            _stockLogic = new StockLogic(conString);
             string itemName = txtItemName.Text;
             string itemPrice = txtItemPrice.Text;
             int categoryId = Convert.ToInt32(ddlCategory.SelectedValue);
@@ -83,6 +86,7 @@ namespace BasicCSharp
 
         protected void UpdateItem(object sender, EventArgs e)
         {
+            _stockLogic = new StockLogic(conString);
             string itemId = lblItemId.Text;
             string itemName = txtItemName.Text;
             string itemPrice = txtItemPrice.Text;
@@ -96,6 +100,7 @@ namespace BasicCSharp
 
         protected void AddOrder(object sender, EventArgs e)
         {
+            _orderLogic = new OrderLogic(conString);
             string orderNumber = lblOrderNo.Text;
             string firstName = txtFirstName.Text.Trim();
             string sureName = txtSureName.Text.Trim();
@@ -107,6 +112,7 @@ namespace BasicCSharp
 
         protected void UpdateOrder(object sender, EventArgs e)
         {
+            _orderLogic = new OrderLogic(conString);
             string name = txtFirstName.Text;
             string orderId = CONTSTANT_OrderID;
             _orderLogic.UpdateOrder(name, orderId);
@@ -124,6 +130,7 @@ namespace BasicCSharp
 
         protected void GvCategory_Delete(object sender, GridViewDeleteEventArgs e)
         {
+            _stockLogic = new StockLogic(conString);
             string catId = gvCategory.DataKeys[e.RowIndex].Value.ToString();
             _stockLogic.DeleteCategory(catId);
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
@@ -144,6 +151,7 @@ namespace BasicCSharp
 
         protected void GvItem_Delete(object sender, GridViewDeleteEventArgs e)
         {
+            _stockLogic = new StockLogic(conString);
             string itemId = gvItem.DataKeys[e.RowIndex].Value.ToString();
             _stockLogic.DeleteItem(itemId);
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
@@ -151,6 +159,7 @@ namespace BasicCSharp
 
         protected void GvOrder_Selected(object sender, EventArgs e)
         {
+            _orderLogic = new OrderLogic(conString);
             GridViewRow row = gvOrder.SelectedRow;
             string orderId = row.Cells[2].Text;
             CONTSTANT_OrderID = orderId;
@@ -174,6 +183,7 @@ namespace BasicCSharp
 
         protected void GvOrder_Delete(object sender, GridViewDeleteEventArgs e)
         {
+            _orderLogic = new OrderLogic(conString);
             string orderId = gvOrder.DataKeys[e.RowIndex].Value.ToString();
             _orderLogic.DeleteOrder(orderId);
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
@@ -181,12 +191,13 @@ namespace BasicCSharp
 
         protected void GvAddOrderItem_Selected(object sender, EventArgs e)
         {
+            _orderLogic = new OrderLogic(conString);
             GridViewRow row = gvAddOrderItem.SelectedRow;
-            string orderId = CONTSTANT_OrderID;
+            string orderId = CONTSTANT_OrderID;    //unknow value CONTSTANT_OrderID;
             string itemName = row.Cells[2].Text;
             string itemPrice = row.Cells[3].Text;
-            string category = row.Cells[6].Text;
-            _orderLogic.AddOrderItemExist(orderId, itemName, itemPrice, category);
+            string categoryId = row.Cells[4].Text;
+            _orderLogic.AddOrderItemExist(orderId, itemName, itemPrice, categoryId);
             lblTotalPrice.Text = _orderLogic.ShowTotalPrice(orderId);
 
             DataTable dtOrderItem = _orderLogic.GetAllOrderItem(orderId);
@@ -196,6 +207,7 @@ namespace BasicCSharp
 
         protected void GvOrderItem_Delete(object sender, GridViewDeleteEventArgs e)
         {
+            _orderLogic = new OrderLogic(conString);
             string orderItemId = gvOrderItem.DataKeys[e.RowIndex].Values[0].ToString();
             string orderId = gvOrderItem.DataKeys[e.RowIndex].Values[1].ToString();
             string itemName = gvOrderItem.DataKeys[e.RowIndex].Values[2].ToString();
@@ -209,6 +221,7 @@ namespace BasicCSharp
 
         protected void AddOrderItem_Click(object sender, EventArgs e)
         {
+            _stockLogic = new StockLogic(conString);
             lblGvAddItem.Visible = true;
             DataTable dtItem = _stockLogic.GetAllItem();
             gvAddOrderItem.DataSource = dtItem;

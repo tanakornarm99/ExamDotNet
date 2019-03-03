@@ -39,7 +39,7 @@ namespace BasicCSharp.DataAccess
 
         public void AddOrder(string orderNumber, string firstName, string sureName)
         {
-            double sumPrice = 0;
+            double sumPrice = 0.00;
             string date = DateTime.Now.ToString();
             string nameFrom = firstName + " " + sureName;
             string cmdText = "INSERT INTO [Order] (OrderNumber,[From],SummaryPrice,Date) VALUES (@orderNumber,@from,@sumPrice,@date)";
