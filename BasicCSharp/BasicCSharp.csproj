@@ -118,6 +118,7 @@
     <Compile Include="BusinessLogic\OrderLogic.cs" />
     <Compile Include="BusinessLogic\StockLogic.cs" />
     <Compile Include="DataAccess\DACategory.cs" />
+    <Compile Include="DataAccess\DACustomer.cs" />
     <Compile Include="DataAccess\DAItem.cs" />
     <Compile Include="DataAccess\DAOrder.cs" />
     <Compile Include="DataAccess\DAOrderItem.cs" />

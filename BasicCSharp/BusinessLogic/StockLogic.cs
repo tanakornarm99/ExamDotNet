@@ -86,6 +86,18 @@ namespace BasicCSharp.BusinessLogic
             }
         }
 
+        public void DeleteCategory(string catId)
+        {
+            DACategory dACategory = new DACategory(_conString);
+            DAOrderItem dAOrderItem = new DAOrderItem(_conString);
+            DAItem dAItem = new DAItem(_conString);
+            string categoryName = dACategory.GetCategoryName(catId);
+            dAOrderItem.DeleteCategoryOrderItem(categoryName);
+            dAItem.DeleteCategoryItem(catId);
+            dACategory.DeleteCategory(catId);
+        }
+
+
         private bool CategoryIsNotExist(string categoryName)
         {
             DACategory dACategory = new DACategory(_conString);
@@ -107,7 +119,6 @@ namespace BasicCSharp.BusinessLogic
             }
             return true;
         }
-
 
     }
 }
