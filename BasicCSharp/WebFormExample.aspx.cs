@@ -162,7 +162,7 @@ namespace BasicCSharp
 
             lblTotalPrice.Text = _orderLogic.ShowTotalPrice(orderId);
 
-            DataTable dtOrderItem = GetAllOrderItem(orderId);
+            DataTable dtOrderItem = _orderLogic.GetAllOrderItem(orderId);
             gvOrderItem.DataSource = dtOrderItem;
             gvOrderItem.DataBind();
 

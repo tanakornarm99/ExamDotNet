@@ -24,6 +24,12 @@ namespace BasicCSharp.BusinessLogic
             return dAOrder.GetAllOrder();
         }
 
+        public DataTable GetAllOrderItem(string orderId)
+        {
+            DAOrderItem dAOrderItem = new DAOrderItem(_conString);
+            return dAOrderItem.GetAllOrderItem(orderId);
+        }
+
         public string GetOrderNumber()
         {
             int length = 4;
@@ -119,7 +125,7 @@ namespace BasicCSharp.BusinessLogic
             }
         }
 
-        private void AddOrderItemExist(string orderId, string itemName, string itemPrice, string category)
+        public void AddOrderItemExist(string orderId, string itemName, string itemPrice, string category)
         {
             DAOrderItem dAOrderItem = new DAOrderItem(_conString);
             int itemQty = 0, sumQty = 0;
@@ -136,6 +142,14 @@ namespace BasicCSharp.BusinessLogic
             {
                 dAOrderItem.AddNewOrderItem(orderId, itemName, itemPrice, category);
             }
+        }
+
+        public void DeleteOrder(string orderId)
+        {
+            DAOrder dAOrder = new DAOrder(_conString);
+            DAOrderItem dAOrderItem = new DAOrderItem(_conString);
+            dAOrderItem.DeleteOrderItemByOrderId(orderId);
+            dAOrder.DeleteOrder(orderId);
         }
 
 

@@ -25,6 +25,13 @@ namespace BasicCSharp.DataAccess
             return _exec.ExecuteQueryWithResult(cmdText, parameters);
         }
 
+        public DataTable GetAllOrderItem(string orderId)
+        {
+            string cmdText = "SELECT * FROM [OrderItem] WHERE OrderId = @orderId";
+            List<Param> parameters = new List<Param>();
+            parameters.Add(_exec.SetParam("orderId", orderId));
+            return _exec.ExecuteQueryWithResult(cmdText, parameters);
+        }
 
         public DataTable GetOrderItemByName(string itemName)
         {
@@ -111,7 +118,7 @@ namespace BasicCSharp.DataAccess
             _exec.ExecuteNonQuery(cmdText, parameters);
         }
 
-        public void DeleteOrderItemID(string orderId)
+        public void DeleteOrderItemByOrderId(string orderId)
         {
             string cmdText = "DELETE FROM [OrderItem] WHERE [OrderId] = @orderId";
             List<Param> parameters = new List<Param>();
@@ -127,13 +134,7 @@ namespace BasicCSharp.DataAccess
             _exec.ExecuteNonQuery(cmdText, parameters);
         }
 
-        public DataTable GetAllOrderItem(string orderId)
-        {
-            string cmdText = "SELECT * FROM [OrderItem] WHERE OrderId = @orderId";
-            List<Param> parameters = new List<Param>();
-            parameters.Add(_exec.SetParam("orderId", orderId));
-            return _exec.ExecuteQueryWithResult(cmdText, parameters);
-        }
+      
 
 
 
