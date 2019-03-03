@@ -127,9 +127,9 @@ namespace BasicCSharp.BusinessLogic
 
         public void AddOrderItemExist(string orderId, string itemName, string itemPrice, string category)
         {
-            DAOrderItem dAOrderItem = new DAOrderItem(_conString);
             int itemQty = 0, sumQty = 0;
             double sumPrice, priceItem = Convert.ToDouble(itemPrice);
+            DAOrderItem dAOrderItem = new DAOrderItem(_conString);
             DataTable dt = dAOrderItem.GetOrderItemByIdAndName(orderId, itemName);
             if (dt.Rows.Count > 0)
             {
@@ -152,6 +152,24 @@ namespace BasicCSharp.BusinessLogic
             dAOrder.DeleteOrder(orderId);
         }
 
+        public void DeleteOrderItem(string orderItemId, string orderId, string itemName, string qty)
+        {
+            int sumQty = Convert.ToInt32(qty);
+            double sumPrice = 0, itemPrice = 0;
+            DAItem dAItem = new DAItem(_conString);
+            DAOrderItem dAOrderItem = new DAOrderItem(_conString);
+            if (sumQty > 1)
+            {
+                itemPrice = Convert.ToDouble(dAItem.GetItemPrice(itemName));
+                sumQty = sumQty - 1;
+                sumPrice = sumQty * itemPrice;
+                dAOrderItem.UpdateOrderItem(orderId, sumQty, sumPrice, itemName);
+            }
+            else
+            {
+                dAOrderItem.DeleteOrderItemName(orderItemId);
+            }
+        }
 
 
     }//end class

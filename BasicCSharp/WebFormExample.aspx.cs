@@ -175,8 +175,7 @@ namespace BasicCSharp
         protected void GvOrder_Delete(object sender, GridViewDeleteEventArgs e)
         {
             string orderId = gvOrder.DataKeys[e.RowIndex].Value.ToString();
-            DeleteOrderItemID(orderId);
-            DeleteOrder(orderId);
+            _orderLogic.DeleteOrder(orderId);
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
         }
 
@@ -187,10 +186,10 @@ namespace BasicCSharp
             string itemName = row.Cells[2].Text;
             string itemPrice = row.Cells[3].Text;
             string category = row.Cells[6].Text;
-            AddOrderItemExist(orderId, itemName, itemPrice, category);
+            _orderLogic.AddOrderItemExist(orderId, itemName, itemPrice, category);
             lblTotalPrice.Text = _orderLogic.ShowTotalPrice(orderId);
 
-            DataTable dtOrderItem = GetAllOrderItem(orderId);
+            DataTable dtOrderItem = _orderLogic.GetAllOrderItem(orderId);
             gvOrderItem.DataSource = dtOrderItem;
             gvOrderItem.DataBind();
         }
@@ -201,21 +200,9 @@ namespace BasicCSharp
             string orderId = gvOrderItem.DataKeys[e.RowIndex].Values[1].ToString();
             string itemName = gvOrderItem.DataKeys[e.RowIndex].Values[2].ToString();
             string qty = gvOrderItem.DataKeys[e.RowIndex].Values[3].ToString();
-            int sumQty = Convert.ToInt32(qty);
-            double sumPrice, itemPrice = 0;
-            if (sumQty > 1)
-            {
-                itemPrice = Convert.ToDouble(GetItemPrice(itemName));
-                sumQty = sumQty - 1;
-                sumPrice = sumQty * itemPrice;
-                UpdateOrderItem(orderId, sumQty, sumPrice, itemName);
-            }
-            else
-            {
-                DeleteOrderItemName(orderItemId);
-            }
+            _orderLogic.DeleteOrderItem(orderItemId, orderId, itemName, qty);
             lblTotalPrice.Text = _orderLogic.ShowTotalPrice(orderId);
-            DataTable dtOrderItem = GetAllOrderItem(orderId);
+            DataTable dtOrderItem = _orderLogic.GetAllOrderItem(orderId);
             gvOrderItem.DataSource = dtOrderItem;
             gvOrderItem.DataBind();
         }
