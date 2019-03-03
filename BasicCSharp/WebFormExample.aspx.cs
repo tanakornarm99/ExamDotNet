@@ -124,7 +124,6 @@ namespace BasicCSharp
 
         protected void GvCategory_Delete(object sender, GridViewDeleteEventArgs e)
         {
-            
             string catId = gvCategory.DataKeys[e.RowIndex].Value.ToString();
             _stockLogic.DeleteCategory(catId);
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
@@ -146,9 +145,7 @@ namespace BasicCSharp
         protected void GvItem_Delete(object sender, GridViewDeleteEventArgs e)
         {
             string itemId = gvItem.DataKeys[e.RowIndex].Value.ToString();
-            string itemName = GetItemName(itemId);
-            DeleteItemOrderItem(itemName);
-            DeleteItem(itemId);
+            _stockLogic.DeleteItem(itemId);
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
         }
 

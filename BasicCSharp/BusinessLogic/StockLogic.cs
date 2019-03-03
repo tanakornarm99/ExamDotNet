@@ -67,7 +67,6 @@ namespace BasicCSharp.BusinessLogic
                 dAOrderItem.UpdateItemNameOrderItem(itemOldName, itemName);
                 dAOrderItem.UpdateCategoryOrderItem(categoryOldName, categoryNewName);
                 dAItem.UpdateItem(itemId, itemName, itemPrice, categoryId);
-
             }
         }
 
@@ -88,15 +87,24 @@ namespace BasicCSharp.BusinessLogic
 
         public void DeleteCategory(string catId)
         {
+            DAItem dAItem = new DAItem(_conString);
             DACategory dACategory = new DACategory(_conString);
             DAOrderItem dAOrderItem = new DAOrderItem(_conString);
-            DAItem dAItem = new DAItem(_conString);
             string categoryName = dACategory.GetCategoryName(catId);
             dAOrderItem.DeleteCategoryOrderItem(categoryName);
             dAItem.DeleteCategoryItem(catId);
             dACategory.DeleteCategory(catId);
         }
 
+        public void DeleteItem(string itemId)
+        {
+            DAItem dAitem = new DAItem(_conString);
+            DAOrderItem dAOrderItem = new DAOrderItem(_conString);
+            string itemName = dAitem.GetItemName(itemId);
+            dAOrderItem.DeleteItemOrderItem(itemName);
+            dAitem.DeleteItem(itemId);
+
+        }
 
         private bool CategoryIsNotExist(string categoryName)
         {
